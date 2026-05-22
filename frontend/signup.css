@@ -1,0 +1,331 @@
+/* Signup Page - Minimal Flat Modern (Split View) */
+
+body {
+    overflow-x: hidden;
+    background: #fff;
+}
+
+.auth-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.auth-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 60px;
+    max-width: 700px;
+}
+
+.auth-header {
+    margin-bottom: 80px;
+}
+
+.auth-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-title h1 {
+    font-size: 4.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 15px;
+    letter-spacing: -3px;
+}
+
+.auth-title .highlight {
+    color: var(--accent-primary, #7c3aed);
+}
+
+.auth-title p {
+    color: var(--text-muted, #64748b);
+    font-size: 1.1rem;
+    margin-bottom: 50px;
+}
+
+/* --- Form Styles --- */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.input-group input, 
+.input-group select, 
+.input-group textarea {
+    border: 2px solid #000;
+    padding: 18px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0;
+    outline: none;
+    transition: 0.2s;
+    background: #fff;
+    font-family: inherit;
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+    background: var(--accent-soft, #f5f3ff);
+    box-shadow: 6px 6px 0px #000;
+    transform: translate(-3px, -3px);
+}
+
+.input-group textarea {
+    resize: none;
+}
+
+.input-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 15px;
+    cursor: pointer;
+}
+
+.input-with-btn {
+    display: flex;
+    gap: 10px;
+}
+
+.input-with-btn input {
+    flex: 1;
+}
+
+.email-container {
+    position: relative;
+}
+
+.email-container.success input,
+.nickname-container.success input {
+    border-color: #22c55e !important;
+    background: #f0fdf4 !important;
+}
+
+.status-msg.success {
+    color: #22c55e;
+}
+
+.status-msg.error {
+    color: #ef4444;
+}
+
+.btn-sub {
+    background: #fff;
+    border: 2px solid #000;
+    padding: 0 25px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.btn-sub:hover {
+    background: #000;
+    color: #fff;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.checkbox-group input {
+    width: 20px;
+    height: 20px;
+    accent-color: #000;
+    border: 2px solid #000;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.btn-auth {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 22px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    margin-top: 20px;
+}
+
+.btn-auth:hover {
+    background: var(--accent-primary);
+    transform: translateY(-5px);
+    box-shadow: 8px 8px 0px #000;
+}
+
+/* --- Social & Footer --- */
+.auth-divider {
+    text-align: center;
+    margin: 40px 0;
+    position: relative;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #eee;
+    z-index: 1;
+}
+
+.auth-divider span {
+    background: #fff;
+    padding: 0 20px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #999;
+    position: relative;
+    z-index: 2;
+}
+
+.social-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+.btn-social {
+    border: none;
+    padding: 15px 10px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: 0.2s;
+    border-radius: 4px; /* Slight radius for cleaner look without borders */
+}
+
+.btn-social.google {
+    background: #ea4335;
+    color: #fff;
+    border: none;
+}
+
+.btn-social.naver {
+    background: #03c75a;
+    color: #fff;
+}
+
+.naver-icon {
+    background: #fff;
+    color: #03c75a;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 900;
+    border-radius: 2px;
+}
+
+.btn-social.kakao {
+    background: #fee500;
+    color: #3c1e1e;
+}
+
+.btn-social.kakao i {
+    color: #3c1e1e;
+}
+
+.btn-social:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.btn-social:active {
+    transform: translateY(0);
+}
+
+.auth-footer {
+    margin-top: 50px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.auth-footer a {
+    color: #000;
+    font-weight: 800;
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent-primary);
+}
+
+/* --- Visual Panel --- */
+.auth-visual {
+    flex: 1.2;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+}
+
+.auth-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+}
+
+.visual-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(to right, rgba(0,0,0,0.4), transparent);
+    z-index: 1;
+}
+
+.visual-quote {
+    position: absolute;
+    bottom: 80px;
+    left: 80px;
+    color: #fff;
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.2;
+    z-index: 2;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .auth-visual { display: none; }
+    .auth-container { max-width: 100%; padding: 40px; }
+}

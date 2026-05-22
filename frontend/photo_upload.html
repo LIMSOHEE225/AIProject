@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 사진으로 캐릭터 만들기</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --accent-primary: #a855f7;
+            --accent-glow: #7c3aed;
+            --bg-sub: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f1f5f9;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .popup-card {
+            background: #ffffff;
+            border: 2px solid #000000;
+            width: 100%;
+            max-width: 520px;
+            padding: 30px;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .popup-header i {
+            font-size: 1.5rem;
+            color: var(--accent-primary);
+        }
+
+        .popup-header h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .info-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--bg-sub);
+            transition: 0.2s;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--accent-primary);
+            background: #fdfeff;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            color: #fff;
+            border: 2px solid #000;
+            padding: 15px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
+            transition: 0.1s;
+        }
+
+        .btn-submit:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 사진 스캔용 특수 레이저 레이어 */
+        .scanner-laser {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(180deg, rgba(168, 85, 247, 0) 0%, rgba(168, 85, 247, 0.3) 90%, rgba(168, 85, 247, 0.7) 100%);
+            border-bottom: 3px solid var(--accent-primary);
+            display: none;
+            z-index: 5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="popup-card">
+        <div class="popup-header">
+            <i class="fa-solid fa-camera-retro"></i>
+            <h3>내 사진으로 아바타 생성</h3>
+        </div>
+
+        <p class="info-desc">
+            본인의 정면 얼굴 사진을 업로드해 주세요. 얼굴의 윤곽선과 눈, 코, 입 등 이목구비의 배치를 인공지능이 정밀 도트 분석하여 나를 쏙 빼닮은 시그니처 픽셀아트 캐릭터를 자동 완성합니다.
+        </p>
+
+        <!-- 정면 이미지 등록 구역 -->
+        <div class="upload-zone" id="photo-upload-zone" onclick="document.getElementById('popup-photo-file').click()">
+            <input type="file" id="popup-photo-file" accept="image/*" style="display: none;" onchange="previewUserPhoto(event)">
+            
+            <!-- 파일 미등록 상태 -->
+            <div id="photo-upload-placeholder">
+                <i class="fa-regular fa-image" style="font-size: 2.5rem; color: #94a3b8; margin-bottom: 10px; display: block;"></i>
+                <span style="font-size: 0.9rem; font-weight: 800; display: block; color: #64748b;">여기를 클릭하여 정면 사진 업로드</span>
+                <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 5px;">정면이 똑바로 나온 이미지여야 이목구비 분석이 정확합니다.</p>
+            </div>
+            
+            <!-- 파일 등록 완료 상태 (프리뷰) -->
+            <div id="photo-upload-preview-container" style="display: none; align-items: center; justify-content: center; gap: 15px;">
+                <img id="photo-upload-preview" src="" style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 2px solid #000;">
+                <div style="text-align: left;">
+                    <span style="font-size: 0.9rem; font-weight: 800; color: var(--text-main); display: block;">얼굴 스캔 대기 중!</span>
+                    <span id="photo-file-name" style="font-size: 0.75rem; color: var(--text-muted); word-break: break-all;">file_name.jpg</span>
+                    <button onclick="removeUserPhoto(event)" style="background: none; border: none; color: #ef4444; font-size: 0.75rem; font-weight: 800; cursor: pointer; padding: 0; margin-top: 5px; display: block;">사진 변경 / 삭제</button>
+                </div>
+            </div>
+
+            <!-- 스캐닝 효과 레이저 -->
+            <div class="scanner-laser" id="popup-scanner-laser"></div>
+        </div>
+
+        <button onclick="submitPhoto()" class="btn-submit">
+            <i class="fa-solid fa-expand"></i> 사진 분석해서 생성하기
+        </button>
+    </div>
+
+    <script>
+        function previewUserPhoto(event) {
+            event.stopPropagation();
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('photo-upload-preview');
+                const fileNameSpan = document.getElementById('photo-file-name');
+                const placeholder = document.getElementById('photo-upload-placeholder');
+                const container = document.getElementById('photo-upload-preview-container');
+
+                if (previewImg) previewImg.src = e.target.result;
+                if (fileNameSpan) fileNameSpan.innerText = file.name;
+                if (placeholder) placeholder.style.display = 'none';
+                if (container) container.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeUserPhoto(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            
+            const fileInput = document.getElementById('popup-photo-file');
+            if (fileInput) fileInput.value = '';
+
+            const placeholder = document.getElementById('photo-upload-placeholder');
+            const container = document.getElementById('photo-upload-preview-container');
+            const previewImg = document.getElementById('photo-upload-preview');
+
+            if (placeholder) placeholder.style.display = 'block';
+            if (container) container.style.display = 'none';
+            if (previewImg) previewImg.src = '';
+        }
+
+        function submitPhoto() {
+            const fileInput = document.getElementById('popup-photo-file');
+            const file = fileInput ? fileInput.files[0] : null;
+
+            if (!file) {
+                alert('나만의 특별 캐릭터를 제작하기 위해 얼굴 사진을 먼저 꼭 올려주세요!');
+                return;
+            }
+
+            const laser = document.getElementById('popup-scanner-laser');
+            if (laser) {
+                laser.style.display = 'block';
+                laser.style.height = '0%';
+                
+                let progress = 0;
+                const scanInterval = setInterval(() => {
+                    progress += 4;
+                    laser.style.height = progress + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(scanInterval);
+                        setTimeout(() => {
+                            laser.style.display = 'none';
+                            
+                            // 부모 창으로 캐릭터 생성 명령 전송
+                            if (window.opener && !window.opener.closed) {
+                                const previewImg = document.getElementById('photo-upload-preview');
+                                const base64Data = previewImg ? previewImg.src : null;
+                                window.opener.generateCharacterFromPhoto(file.name, base64Data);
+                            } else {
+                                alert('부모 마이페이지 창이 닫혀 있어 연동에 실패했습니다.');
+                            }
+                            window.close(); // 분석 완료 후 팝업 자동 종료
+                        }, 300);
+                    }
+                }, 40); // 1초 간 강렬한 스캐닝 레이저 오퍼레이션
+            }
+        }
+    </script>
+</body>
+</html>

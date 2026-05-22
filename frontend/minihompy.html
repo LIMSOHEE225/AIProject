@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이홈피 | DearZit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="minihompy.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- 3D 모델 뷰어 (Google Model Viewer) & Meshopt 디코더 -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    <!-- Meshopt: UMD 로드 후 model-viewer에 연결 -->
+    <script src="https://cdn.jsdelivr.net/npm/meshoptimizer@0.18.1/meshopt_decoder.js"></script>
+    <script>
+        customElements.whenDefined('model-viewer').then(() => {
+            if (typeof MeshoptDecoder !== 'undefined') {
+                customElements.get('model-viewer').meshoptDecoder = MeshoptDecoder;
+                console.log('[MeshoptDecoder] Connected to model-viewer');
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="background-dots"></div>
+    
+    <div class="split-layout">
+        <!-- Left Area: Minihompy (70%) -->
+        <div class="hompy-side">
+            <div class="hompy-outer-container">
+                <div class="hompy-inner-container">
+                    <!-- Left Sidebar: Profile -->
+                    <aside class="sidebar-left">
+                        <div class="visit-count">
+                            TODAY <span class="today-num">12</span> | TOTAL <span class="total-num">258</span>
+                        </div>
+                        <div class="profile-box">
+                            <div class="today-is">
+                                TODAY IS.. <span class="status-emoji">🍀</span> <span class="status-text">행복</span>
+                            </div>
+                            <div class="minime-wrapper" style="width: 100%; height: 150px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #eee;">
+                                <!-- 3D 모델 뷰어 -->
+                                <model-viewer 
+                                    id="minime-sidebar-3d" 
+                                    src="" 
+                                    alt="3D Avatar" 
+                                    auto-rotate 
+                                    camera-controls 
+                                    interaction-prompt="none"
+                                    shadow-intensity="1" 
+                                    style="width: 100%; height: 100%; display: none; background: transparent; --poster-color: transparent;">
+                                </model-viewer>
+                                <!-- AI 아바타가 없을 때 대체 표시 -->
+                                <div id="minime-sidebar-placeholder" style="text-align: center; color: #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 14px;">
+                                    <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 2.2rem; color: #a855f7; margin-bottom: 6px; display: block;"></i>
+                                    <span style="font-weight: bold; color: #555;">AI 3D 아바타가 없습니다</span>
+                                    <a href="/mypage.html" style="margin-top: 5px; color: var(--accent-blue); text-decoration: underline; font-weight: bold;">3D 아바타 만들기</a>
+                                </div>
+                            </div>
+                            <div style="position: relative; min-height: 40px;">
+                                <div class="profile-intro" id="profile-intro-text">
+                                    사이좋은 사람들<br>
+                                    DearZit 월드<br>
+                                    ^_^
+                                </div>
+                                <button id="btn-edit-bio" onclick="startEditBio()" style="position: absolute; right: 2px; top: 2px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; display: none; z-index: 10;"><i class="fa-solid fa-pen" style="margin-right:3px;"></i>수정</button>
+                            </div>
+                            <div id="bio-edit-container" style="display: none; margin-bottom: 10px;">
+                                <textarea id="bio-input" style="width: 100%; height: 80px; font-size: 14px; padding: 5px; border: 1px solid var(--accent-blue); outline: none; resize: none;"></textarea>
+                                <div style="display: flex; justify-content: flex-end; gap: 5px; margin-top: 5px;">
+                                    <button onclick="cancelEditBio()" style="background: #eee; border: none; padding: 3px 8px; font-size: 14px; cursor: pointer; border-radius: 4px;">취소</button>
+                                    <button onclick="saveBio()" style="background: var(--accent-blue); color: #fff; border: none; padding: 3px 8px; font-size: 14px; cursor: pointer; border-radius: 4px;">저장</button>
+                                </div>
+                            </div>
+                            <div class="profile-history">
+                                <a href="#">EDIT</a> <a href="#">HISTORY</a>
+                            </div>
+                            <div class="profile-user">
+                                <span class="user-name">임소희</span> (♀)
+                            </div>
+                            <div class="pado-select">
+                                <select>
+                                    <option>파도타기</option>
+                                    <option>디자인마스터</option>
+                                    <option>코지러버</option>
+                                </select>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Main Content Area -->
+                    <main class="main-content">
+                        <div class="header-row">
+                            <h1 class="hompy-title" id="page-title">사이좋은 사람들</h1>
+                            <span class="hompy-url">http://www.dearzit.com/sohee</span>
+                        </div>
+                        
+                        <!-- View: Home -->
+                        <div id="view-home" class="view-content">
+                            <div class="content-box">
+                                <section class="updated-news">
+                                    <h3 class="section-title">Updated news</h3>
+                                    <div class="news-list" id="home-news-list">
+                                        <!-- 동적 데이터 -->
+                                    </div>
+                                </section>
+
+                                <section class="guestbook-preview">
+                                    <h3 class="section-title">방명록</h3>
+                                    <div id="home-guestbook-list">
+                                        <!-- 동적 데이터 -->
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+
+                        <!-- View: Settings -->
+                        <div id="view-settings" class="view-content" style="display: none;">
+                            <div class="content-box">
+                                <section class="basic-settings" style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #eee;">
+                                    <h3 class="section-title">홈페이지 기본 설정</h3>
+                                    <div class="add-menu-form-v2">
+                                        <div class="input-group">
+                                            <label>홈페이지 제목</label>
+                                            <div style="display: flex; gap: 10px;">
+                                                <input type="text" id="hp-title-input" placeholder="예: 사이좋은 사람들">
+                                            </div>
+                                        </div>
+                                        <div class="input-group">
+                                            <label>공개 범위</label>
+                                            <div class="privacy-options">
+                                                <label class="privacy-btn"><input type="radio" name="hp-visibility" value="public" checked> <span>전체공개</span></label>
+                                                <label class="privacy-btn"><input type="radio" name="hp-visibility" value="neighbor"> <span>이웃공개</span></label>
+                                                <label class="privacy-btn"><input type="radio" name="hp-visibility" value="private"> <span>비공개</span></label>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                                            <button onclick="saveBasicSettings()" class="btn-add">기본 정보 저장</button>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section class="menu-management">
+                                    <h3 class="section-title">메뉴 관리</h3>
+                                    <p class="guide-text">원하는 메뉴 이름을 입력하고 공개 범위를 설정해보세요! 메뉴를 드래그하여 순서를 바꿀 수 있습니다.</p>
+                                    
+                                    <div class="add-menu-form-v2">
+                                        <div class="input-group">
+                                            <label>새 메뉴 이름</label>
+                                            <div style="display: flex; gap: 10px;">
+                                                <input type="text" id="new-menu-name" placeholder="예: 나의 사진첩">
+                                                <button onclick="addCustomMenu()" class="btn-add">추가</button>
+                                            </div>
+                                        </div>
+                                        <div class="input-group">
+                                            <label>공개 범위</label>
+                                            <div class="privacy-options">
+                                                <label class="privacy-btn"><input type="radio" name="privacy" value="public" checked> <span>전체공개</span></label>
+                                                <label class="privacy-btn"><input type="radio" name="privacy" value="neighbor"> <span>이웃공개</span></label>
+                                                <label class="privacy-btn"><input type="radio" name="privacy" value="private"> <span>비공개</span></label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="admin-menu-list" class="admin-menu-list"></div>
+                                    <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                                        <button onclick="saveMenuSettings()" class="btn-add">메뉴 설정 저장</button>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+
+                        <!-- View: Custom -->
+                        <div id="view-custom" class="view-content" style="display: none;">
+                            <div class="content-box" id="custom-page-content"></div>
+                        </div>
+                    </main>
+
+                    <!-- Right Tabs -->
+                    <nav class="sidebar-tabs" id="sidebar-tabs"></nav>
+                </div>
+                
+                <!-- 쇼핑하기 플로팅 버튼 -->
+                <button onclick="window.location.href='/shopping.html'" style="position: absolute; bottom: -15px; right: 20px; background: #fb923c; color: white; padding: 12px 24px; border-radius: 30px; font-weight: bold; font-size: 15px; border: 3px solid #fff; box-shadow: 0 4px 15px rgba(251, 146, 60, 0.4); cursor: pointer; transition: transform 0.2s; z-index: 100;">
+                    <i class="fa-solid fa-cart-shopping" style="margin-right: 6px;"></i> 쇼핑하기
+                </button>
+            </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const DEFAULT_MENUS = [
+            { name: '홈', type: 'home', isFixed: true, visibility: 'public' },
+            { name: '방명록', type: 'guestbook', isFixed: true, visibility: 'public' },
+            { name: '환경설정', type: 'settings', isFixed: true, visibility: 'private' }
+        ];
+
+        const PRIVACY_TEXT = { 'public': '전체공개', 'neighbor': '이웃공개', 'private': '비공개' };
+
+        let customMenus = [...DEFAULT_MENUS];
+        let savedMenus = [...DEFAULT_MENUS];
+
+        let galleryPosts = {};
+        let guestbookMsgs = [];
+        let currentTab = 'home';
+        let editingIndex = -1;
+        let commentEditingIndex = -1;
+        let replyToIndex = -1;
+        let guestReplyToIndex = -1;
+        let guestEditingIndex = -1;
+        let viewState = 'list';
+        let currentPostIndex = -1;
+        let tempImages = [];
+        let currentUserNickname = '익명';
+        let homepageOwner = '임소희';
+        let sortableInstance = null;
+        let memberId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userInfoStr = localStorage.getItem(CONFIG.USER_INFO_KEY);
+            if (!userInfoStr) {
+                alert("로그인이 필요합니다.");
+                location.href = "/login.html";
+                return;
+            }
+            const userInfo = JSON.parse(userInfoStr);
+            memberId = userInfo.id || userInfo.user_id; // Supabase 사용자 ID
+            currentUserNickname = userInfo.user_metadata?.nickname || userInfo.email.split('@')[0];
+            document.querySelector('.user-name').innerText = currentUserNickname;
+            homepageOwner = currentUserNickname;
+            
+            // 내 홈페이지일 경우 소개글 수정 버튼 활성화
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetId = urlParams.get('id');
+            // 문자열 변환 후 비교하여 안전성 확보
+            if (!targetId || String(targetId) === String(memberId)) {
+                const editBtn = document.getElementById('btn-edit-bio');
+                if (editBtn) editBtn.style.display = 'block';
+            }
+            
+            await loadBio(targetId || memberId);
+            
+            // DB에서 메뉴 설정 가져오기
+            await loadSettings();
+            // 커스텀 메뉴 가져오기
+            await loadMenus();
+            // DB에서 방명록 가져오기
+            await loadGuestbook();
+            // DB에서 갤러리/게시글 가져오기
+            await loadPosts();
+            
+            renderHome(); // 홈 화면 초기 렌더링
+
+            // AI로 생성된 3D 미니미 캐릭터가 있다면 적용 (2D 도트 및 고정 아바타 배제)
+            const customMinimeGlb = localStorage.getItem('custom_minime_glb');
+            const sidebar3d = document.getElementById('minime-sidebar-3d');
+            const sidebarPlaceholder = document.getElementById('minime-sidebar-placeholder');
+            const room3d = document.getElementById('minime-room-3d');
+            const roomPlaceholder = document.getElementById('minime-room-placeholder');
+
+            if (customMinimeGlb) {
+                if (sidebar3d) {
+                    sidebar3d.src = customMinimeGlb;
+                    sidebar3d.style.display = 'block';
+                }
+                if (sidebarPlaceholder) sidebarPlaceholder.style.display = 'none';
+                
+                if (room3d) {
+                    room3d.src = customMinimeGlb;
+                    room3d.style.display = 'block';
+                }
+                if (roomPlaceholder) roomPlaceholder.style.display = 'none';
+            } else {
+                if (sidebar3d) sidebar3d.style.display = 'none';
+                if (sidebarPlaceholder) sidebarPlaceholder.style.display = 'flex';
+                
+                if (room3d) room3d.style.display = 'none';
+                if (roomPlaceholder) roomPlaceholder.style.display = 'flex';
+            }
+
+            // 2) 3D 방(Room)이 있다면 적용
+            const customMiniroomGlb = localStorage.getItem('custom_miniroom_glb');
+            const roomBg3d = document.getElementById('miniroom-bg-3d');
+            const cssFallbackRoom = document.getElementById('css-fallback-room');
+            
+            if (customMiniroomGlb) {
+                if (roomBg3d) {
+                    roomBg3d.src = customMiniroomGlb;
+                    roomBg3d.style.display = 'block';
+                }
+                if (cssFallbackRoom) cssFallbackRoom.style.display = 'none';
+            } else {
+                if (roomBg3d) roomBg3d.style.display = 'none';
+                if (cssFallbackRoom) cssFallbackRoom.style.display = 'block';
+            }
+
+            // 3) 카메라 동기화 (방과 아바타가 함께 돌아가도록 설정)
+            if (room3d && roomBg3d) {
+                let isSyncing = false;
+                
+                room3d.addEventListener('camera-change', (e) => {
+                    if (isSyncing || !customMiniroomGlb) return;
+                    isSyncing = true;
+                    const orbit = room3d.getCameraOrbit();
+                    const bgOrbit = roomBg3d.getCameraOrbit();
+                    // theta(수평 회전)와 phi(수직 회전)만 동기화하고 반경(radius)은 각 모델 유지
+                    roomBg3d.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${bgOrbit.radius}m`;
+                    isSyncing = false;
+                });
+                
+                roomBg3d.addEventListener('camera-change', (e) => {
+                    if (isSyncing || !customMinimeGlb) return;
+                    isSyncing = true;
+                    const orbit = roomBg3d.getCameraOrbit();
+                    const charOrbit = room3d.getCameraOrbit();
+                    room3d.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${charOrbit.radius}m`;
+                    isSyncing = false;
+                });
+            }
+        });
+
+        async function loadBio(userId) {
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/auth/me?member_id=${userId}`);
+                const result = await res.json();
+                if (result.status === 'success' && result.data.bio) {
+                    document.getElementById('profile-intro-text').innerHTML = result.data.bio.replace(/\n/g, '<br>');
+                } else {
+                    document.getElementById('profile-intro-text').innerHTML = '작성된 소개글이 없습니다.';
+                }
+            } catch (e) {
+                console.error("Failed to load bio:", e);
+            }
+        }
+
+        function startEditBio() {
+            const currentText = document.getElementById('profile-intro-text').innerHTML.replace(/<br\s*\/?>/gi, '\n');
+            document.getElementById('bio-input').value = currentText === '작성된 소개글이 없습니다.' ? '' : currentText;
+            document.getElementById('profile-intro-text').style.display = 'none';
+            document.getElementById('btn-edit-bio').style.display = 'none';
+            document.getElementById('bio-edit-container').style.display = 'block';
+        }
+
+        function cancelEditBio() {
+            document.getElementById('bio-edit-container').style.display = 'none';
+            document.getElementById('profile-intro-text').style.display = 'block';
+            document.getElementById('btn-edit-bio').style.display = 'block';
+        }
+
+        async function saveBio() {
+            if (!memberId) return;
+            const newBio = document.getElementById('bio-input').value.trim();
+            
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/auth/me?member_id=${memberId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bio: newBio })
+                });
+                const result = await res.json();
+                
+                if (result.status === 'success') {
+                    document.getElementById('profile-intro-text').innerHTML = newBio ? newBio.replace(/\n/g, '<br>') : '작성된 소개글이 없습니다.';
+                    cancelEditBio();
+                } else {
+                    alert('소개글 저장에 실패했습니다.');
+                }
+            } catch (e) {
+                console.error("Failed to save bio:", e);
+                alert('소개글 저장 중 오류가 발생했습니다.');
+            }
+        }
+
+        async function loadGuestbook() {
+            if (!memberId) return;
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/guestbook?member_id=${memberId}`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    // DB 데이터를 프론트엔드 형식으로 매핑
+                    guestbookMsgs = result.data.map(m => ({
+                        id: m.id,
+                        user: m.writer_name || '익명',
+                        content: m.content,
+                        date: m.created_at,
+                        replyTo: m.reply_to // 답글 기능 확장을 위해 유지
+                    }));
+                    if (currentTab === 'guestbook') renderGuestbook();
+                    if (currentTab === 'home') renderHome();
+                }
+            } catch (err) {
+                console.error("Failed to load guestbook:", err);
+            }
+        }
+
+        async function loadPosts() {
+            if (!memberId) return;
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/posts?member_id=${memberId}`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    galleryPosts = {};
+                    
+                    let likedLikes = [];
+                    try {
+                        likedLikes = JSON.parse(localStorage.getItem('minihompy_likes') || '[]');
+                    } catch(e) {
+                        likedLikes = [];
+                    }
+                    if (!Array.isArray(likedLikes)) likedLikes = [];
+
+                    result.data.forEach(dbPost => {
+                        const menuType = dbPost.menu_id;
+                        if (!galleryPosts[menuType]) galleryPosts[menuType] = [];
+                        
+                        // dbPost -> 프론트엔드 포맷
+                        let parsedImages = [];
+                        if (dbPost.images) {
+                            if (typeof dbPost.images === 'string') {
+                                try { parsedImages = JSON.parse(dbPost.images); } catch(e) { parsedImages = []; }
+                            } else if (Array.isArray(dbPost.images)) {
+                                parsedImages = dbPost.images;
+                            }
+                        }
+                        
+                        let parsedComments = [];
+                        if (dbPost.comments) {
+                            if (typeof dbPost.comments === 'string') {
+                                try { parsedComments = JSON.parse(dbPost.comments); } catch(e) { parsedComments = []; }
+                            } else if (Array.isArray(dbPost.comments)) {
+                                parsedComments = dbPost.comments;
+                            }
+                        }
+
+                        const postData = {
+                            id: dbPost.id,
+                            title: dbPost.title,
+                            content: dbPost.content,
+                            images: parsedImages,
+                            date: dbPost.created_at,
+                            isLiked: dbPost.id ? likedLikes.includes(dbPost.id) : false, 
+                            likeCount: dbPost.like_count || 0,
+                            comments: parsedComments
+                        };
+                        galleryPosts[menuType].push(postData);
+                    });
+                    if (currentTab !== 'home' && currentTab !== 'settings' && currentTab !== 'guestbook') {
+                        renderCustomPage(currentTab);
+                    } else if (currentTab === 'home') {
+                        renderHome();
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load posts:", err);
+            }
+        }
+
+        async function loadSettings() {
+            if (!memberId) return;
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/me?member_id=${memberId}`);
+                const result = await response.json();
+                if (result.status === 'success' && result.data) {
+                    const data = result.data;
+                    
+                    // 제목 반영
+                    if (data.title) {
+                        document.getElementById('page-title').innerText = data.title;
+                        const titleInput = document.getElementById('hp-title-input');
+                        if (titleInput) titleInput.value = data.title;
+                    }
+
+                    // 공개 여부 반영
+                    if (data.visibility) {
+                        const visibilityRadio = document.querySelector(`input[name="hp-visibility"][value="${data.visibility}"]`);
+                        if (visibilityRadio) visibilityRadio.checked = true;
+                    }
+                    
+                    // 저장된 메뉴 순서
+                    if (data.menus) {
+                        window.savedMenuOrder = data.menus.split(',');
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load settings:", err);
+            }
+        }
+
+        async function loadMenus() {
+            if (!memberId) {
+                renderMenus();
+                return;
+            }
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/menus?member_id=${memberId}`);
+                const result = await response.json();
+                if (result.status === 'success' && result.data) {
+                    const dbMenus = result.data.map(m => ({
+                        id: m.id,
+                        name: m.menu_name,
+                        type: m.id, // 백엔드의 UUID를 타입 식별자로 사용
+                        visibility: m.visibility,
+                        isFixed: false
+                    }));
+                    
+                    let allMenus = [...DEFAULT_MENUS, ...dbMenus];
+                    if (window.savedMenuOrder) {
+                        customMenus = [];
+                        window.savedMenuOrder.forEach(type => {
+                            let m = allMenus.find(x => x.type === type);
+                            if (m) {
+                                customMenus.push(m);
+                                allMenus = allMenus.filter(x => x.type !== type);
+                            }
+                        });
+                        customMenus = [...customMenus, ...allMenus];
+                    } else {
+                        customMenus = allMenus;
+                    }
+                } else {
+                    customMenus = [...DEFAULT_MENUS];
+                }
+            } catch(e) {
+                console.error("Failed to load menus", e);
+                customMenus = [...DEFAULT_MENUS];
+            }
+            savedMenus = JSON.parse(JSON.stringify(customMenus));
+            renderMenus();
+        }
+
+        async function saveBasicSettings() {
+            const titleInput = document.getElementById('hp-title-input');
+            const newTitle = titleInput ? titleInput.value.trim() : '';
+            const visibility = document.querySelector('input[name="hp-visibility"]:checked')?.value || 'public';
+            
+            if (!newTitle) return alert("제목을 입력해주세요.");
+            
+            if (memberId) {
+                try {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/save-settings`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            member_id: memberId,
+                            title: newTitle,
+                            visibility: visibility
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        document.getElementById('page-title').innerText = newTitle;
+                        alert("[저장되었습니다]");
+                    }
+                } catch (err) {
+                    console.error("Save Error:", err);
+                    alert("저장에 실패했습니다.");
+                }
+            }
+        }
+
+        function renderMenus() {
+            const tabsContainer = document.getElementById('sidebar-tabs');
+            const adminListContainer = document.getElementById('admin-menu-list');
+            let sidebarHtml = '';
+            savedMenus.forEach(menu => { sidebarHtml += `<button class="tab-item ${currentTab === menu.type ? 'active' : ''}" onclick="switchView('${menu.type}')">${menu.name}</button>`; });
+            tabsContainer.innerHTML = sidebarHtml;
+            if (adminListContainer) {
+                let adminHtml = '';
+                customMenus.forEach((menu, index) => {
+                    const isEditing = editingIndex === index;
+                    let privacyIcon = menu.visibility === 'public' ? 'fa-globe' : (menu.visibility === 'neighbor' ? 'fa-users' : 'fa-lock');
+                    let iconClass = menu.type === 'home' ? 'fa-house' : (menu.type === 'guestbook' ? 'fa-book-open' : (menu.type === 'settings' ? 'fa-gear' : 'fa-image'));
+                    let privacyLabel = PRIVACY_TEXT[menu.visibility] || menu.visibility;
+                    adminHtml += `<div class="admin-menu-item ${isEditing ? 'editing' : ''}" data-index="${index}"><div style="display:flex; align-items:center; gap:10px; flex:1; cursor:grab;"><i class="fa-solid fa-grip-vertical" style="color:#ddd; font-size:0.8rem;"></i><i class="fa-solid ${iconClass}" style="color:var(--accent-blue); width:20px; text-align:center;"></i>${isEditing ? `<input type="text" id="edit-menu-name" value="${menu.name}" class="edit-input" onkeypress="if(event.keyCode==13) saveEdit(${index})">` : `<div style="display:flex; flex-direction:column;"><span class="menu-name-text">${menu.name} ${menu.isFixed ? '<small style="color:#999; font-weight:normal; font-size:0.65rem;">(고정)</small>' : ''}</span><span style="font-size:0.7rem; color:#999;"><i class="fa-solid ${privacyIcon}"></i> ${privacyLabel}</span></div>`}</div><div style="display:flex; gap:5px;">${isEditing ? `<button class="btn-confirm" onclick="saveEdit(${index})">확인</button><button class="btn-cancel" onclick="cancelEdit()">취소</button>` : `<button class="btn-edit" onclick="startEdit(${index})">수정</button>${!menu.isFixed ? `<button class="btn-delete" onclick="deleteCustomMenu(${index})">삭제</button>` : ''}`}</div></div>`;
+                });
+                adminListContainer.innerHTML = adminHtml;
+                initSortable();
+                if (editingIndex !== -1) document.getElementById('edit-menu-name').focus();
+            }
+        }
+
+        function initSortable() {
+            const el = document.getElementById('admin-menu-list'); if (!el) return;
+            if (sortableInstance) sortableInstance.destroy();
+            sortableInstance = Sortable.create(el, { animation: 150, handle: '.fa-grip-vertical', onEnd: async function () { const newMenus = []; const items = el.querySelectorAll('.admin-menu-item'); items.forEach(item => { newMenus.push(customMenus[parseInt(item.getAttribute('data-index'))]); }); customMenus = newMenus; renderMenus(); } });
+        }
+
+        function switchView(tabType) {
+            currentTab = tabType; viewState = 'list';
+            document.querySelectorAll('.view-content').forEach(view => view.style.display = 'none');
+            // 홈페이지 제목은 고정되어야 하므로 탭 이름으로 덮어쓰지 않음
+            const activeMenu = savedMenus.find(m => m.type === tabType) || customMenus.find(m => m.type === tabType);
+            
+            if (tabType === 'home') { document.getElementById('view-home').style.display = 'block'; renderHome(); } 
+            else if (tabType === 'settings') { document.getElementById('view-settings').style.display = 'block'; } 
+            else if (tabType === 'guestbook') { document.getElementById('view-custom').style.display = 'block'; renderGuestbook(); } 
+            else { document.getElementById('view-custom').style.display = 'block'; renderCustomPage(tabType); }
+            renderMenus();
+        }
+
+        function renderHome() {
+            // 1. Updated News
+            const newsListEl = document.getElementById('home-news-list');
+            if (newsListEl) {
+                let allPosts = [];
+                for (let menuType in galleryPosts) {
+                    const menu = savedMenus.find(m => m.type === menuType);
+                    const menuName = menu ? menu.name : '게시판';
+                    galleryPosts[menuType].forEach(post => {
+                        allPosts.push({ ...post, menuName });
+                    });
+                }
+                allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+                const topNews = allPosts.slice(0, 4);
+                if (topNews.length === 0) {
+                    newsListEl.innerHTML = '<div class="news-item" style="color:#999; justify-content:center; padding:10px; font-size:16px;">새로운 글이 없습니다.</div>';
+                } else {
+                    newsListEl.innerHTML = topNews.map(p => `<div class="news-item"><span class="badge photo">${p.menuName}</span> ${p.title}</div>`).join('');
+                }
+            }
+
+            // 2. 방명록 (Guestbook preview)
+            const gbPreviewEl = document.getElementById('home-guestbook-list');
+            if (gbPreviewEl) {
+                const latestGb = [...guestbookMsgs].reverse().slice(0, 10);
+                if (latestGb.length === 0) {
+                    gbPreviewEl.innerHTML = '<div class="guest-msg" style="color:#999; justify-content:center; font-size:16px; padding: 10px;">최근 작성된 방명록이 없습니다.</div>';
+                } else {
+                    gbPreviewEl.innerHTML = latestGb.map(m => `
+                        <div class="guest-msg">
+                            <span class="guest-name">${m.user}:</span> ${m.content}
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function renderGuestbook() {
+            const container = document.getElementById('custom-page-content');
+            container.innerHTML = `
+                <section class="guestbook-view">
+                    <div style="display:flex; justify-content:space-between; align-items:center; mb:15px; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+                        <h3 class="section-title" style="margin:0;">방명록</h3>
+                    </div>
+                    <div class="guestbook-input-box" style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:20px; border:1px solid #eee;">
+                        <textarea id="guest-msg-input" placeholder="따뜻한 한마디를 남겨주세요." style="width:100%; height:70px; border:1px solid #ddd; border-radius:8px; padding:10px; outline:none; resize:none; margin-bottom:10px; font-size:0.85rem;"></textarea>
+                        <button onclick="addGuestMsg()" style="float:right; background:var(--accent-blue); color:#fff; border:none; padding:8px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">등록</button>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div class="guestbook-list">
+                        ${guestbookMsgs.length === 0 ? '<div style="text-align:center; color:#ccc; padding:40px;">첫 방명록의 주인공이 되어보세요!</div>' : 
+                            guestbookMsgs.map((m, i) => {
+                                const isEditing = guestEditingIndex === i;
+                                const isReplying = guestReplyToIndex === i;
+                                const canManage = (currentUserNickname === m.user || currentUserNickname === homepageOwner);
+                                return `
+                                    <div class="guest-msg-item" style="background:#fff; border:1px solid #eee; padding:15px; border-radius:10px; margin-bottom:12px; ${m.replyTo ? 'margin-left:30px; border-left:3px solid #eee;' : ''}">
+                                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:5px;">
+                                            <span style="font-weight:bold; color:var(--accent-blue); font-size:0.85rem;">
+                                                ${m.replyTo ? '<span style="color:var(--accent-blue); margin-right:5px; font-weight:bold;">ㄴ</span>' : ''}${m.user} ${m.replyTo ? `<span style="font-size:0.7rem; color:#999; font-weight:normal;">(@${m.replyTo})</span>` : ''}
+                                            </span>
+                                            <span style="font-size:0.75rem; color:#999;">${new Date(m.date).toLocaleString()}</span>
+                                        </div>
+                                        <div style="font-size:0.85rem; line-height:1.5; color:#444; margin-bottom:10px;">
+                                            ${isEditing ? 
+                                                `<div style="display:flex; gap:8px;"><textarea id="edit-guest-val" style="flex:1; height:60px; padding:8px; border:1px solid var(--accent-blue); border-radius:6px; font-size:0.85rem; resize:none;">${m.content}</textarea><button onclick="saveGuestEdit(${i})" style="background:var(--accent-blue); color:#fff; border:none; border-radius:6px; padding:0 15px; font-weight:bold; cursor:pointer;">확인</button></div>` : 
+                                                m.content.replace(/\n/g, '<br>')
+                                            }
+                                        </div>
+                                        <div class="guest-actions" style="display:flex; gap:12px; font-size:0.75rem; color:#aaa; justify-content:flex-end;">
+                                            <span style="cursor:pointer;" onclick="setGuestReply(${i})">답글</span>
+                                            ${canManage && !isEditing ? `<span style="cursor:pointer;" onclick="startGuestEdit(${i})">수정</span>` : ''}
+                                            ${canManage ? `<span style="cursor:pointer;" onclick="deleteGuestMsg('${m.id}')">삭제</span>` : ''}
+                                            ${isEditing ? `<span style="cursor:pointer; color:#ff5252;" onclick="cancelGuestEdit()">취소</span>` : ''}
+                                        </div>
+                                        ${isReplying ? `
+                                            <div class="inline-reply-form" style="margin-top:10px; padding:10px; background:#f0f8ff; border-radius:8px; border:1px solid #d0e8ff;">
+                                                <div style="display:flex; gap:8px; align-items:center;">
+                                                    <span style="color:var(--accent-blue); font-weight:bold; font-size:1.1rem;">ㄴ</span>
+                                                    <textarea id="inline-guest-reply-input" placeholder="${m.user}님께 답글..." style="flex:1; height:50px; font-size:0.8rem; padding:8px; border:1px solid #ddd; border-radius:6px; outline:none; resize:none;"></textarea>
+                                                    <div style="display:flex; flex-direction:column; gap:5px;">
+                                                        <button onclick="addGuestInlineReply(${i})" style="background:var(--accent-blue); color:#fff; border:none; padding:5px 12px; border-radius:4px; font-size:0.75rem; font-weight:bold; cursor:pointer;">확인</button>
+                                                        <button onclick="cancelGuestReply()" style="background:#eee; color:#666; border:none; padding:5px 12px; border-radius:4px; font-size:0.75rem; cursor:pointer;">취소</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                    </div>`;
+                            }).join('')
+                        }
+                    </div>
+                </section>`;
+        }
+
+        function setGuestReply(index) { guestReplyToIndex = index; guestEditingIndex = -1; renderGuestbook(); setTimeout(() => document.getElementById('inline-guest-reply-input')?.focus(), 50); }
+        function cancelGuestReply() { guestReplyToIndex = -1; renderGuestbook(); }
+        function startGuestEdit(index) { guestEditingIndex = index; guestReplyToIndex = -1; renderGuestbook(); setTimeout(() => document.getElementById('edit-guest-val')?.focus(), 50); }
+        function cancelGuestEdit() { guestEditingIndex = -1; renderGuestbook(); }
+        async function deleteGuestMsg(id) {
+            if (!confirm('방명록을 삭제할까요?')) return;
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/guestbook/${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    await loadGuestbook();
+                }
+            } catch (err) {
+                console.error("Delete Guestbook Error:", err);
+                alert("삭제에 실패했습니다.");
+            }
+        }
+        async function saveGuestEdit(index) { const newVal = document.getElementById('edit-guest-val').value.trim(); if (!newVal) return; const msgId = guestbookMsgs[index].id; if(msgId) { try { await fetch(`${CONFIG.API_BASE_URL}/homepage/guestbook/${msgId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: newVal }) }); await loadGuestbook(); } catch(e) { console.error(e); } } guestEditingIndex = -1; renderGuestbook(); }
+        async function addGuestInlineReply(targetIndex) { const input = document.getElementById('inline-guest-reply-input'); const content = input.value.trim(); if (!content) return; const targetUser = guestbookMsgs[targetIndex].user; if(memberId) { try { await fetch(`${CONFIG.API_BASE_URL}/homepage/guestbook`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ homepage_member_id: memberId, writer_name: currentUserNickname, content: content, reply_to: targetUser }) }); await loadGuestbook(); } catch(e) { console.error(e); } } guestReplyToIndex = -1; renderGuestbook(); }
+        async function addGuestMsg() {
+            const input = document.getElementById('guest-msg-input');
+            const content = input.value.trim();
+            if (!content) return;
+            
+            if (memberId) {
+                try {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/guestbook`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            homepage_member_id: memberId,
+                            writer_name: currentUserNickname,
+                            content: content
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        input.value = '';
+                        await loadGuestbook();
+                    }
+                } catch (err) {
+                    console.error("Add Guestbook Error:", err);
+                    alert("방명록 등록에 실패했습니다.");
+                }
+            } else {
+                alert("로그인이 필요합니다.");
+            }
+        }
+
+        function renderCustomPage(tabType) {
+            const container = document.getElementById('custom-page-content');
+            if (viewState === 'write' || viewState === 'edit') { renderWriteForm(tabType); return; }
+            else if (viewState === 'read') { renderReadView(tabType, currentPostIndex); return; }
+            const posts = galleryPosts[tabType] || [];
+            container.innerHTML = `<section class="gallery-view"><div style="display:flex; justify-content:flex-end; align-items:center; mb:15px; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;"><button class="btn-upload" onclick="openWriteForm()"><i class="fa-solid fa-pen-to-square"></i> 글쓰기</button></div><div class="gallery-grid">${posts.length === 0 ? `<div class="empty-gallery">등록된 글이 없습니다.</div>` : posts.map((post, idx) => { const commentCount = (post.comments || []).length; return `<div class="gallery-item post-card" onclick="openReadView(${idx})"><div class="post-thumb">${post.images.length > 0 ? `<img src="${post.images[0]}">` : '<div class="no-img">NO IMAGE</div>'}<div class="heart-container ${post.isLiked ? 'active' : ''}" onclick="toggleLike(event, '${tabType}', ${idx})"><i class="${post.isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i><span class="like-count">${post.likeCount || 0}</span></div>${commentCount > 0 ? `<div class="comment-count-badge"><i class="fa-regular fa-comment"></i> ${commentCount}</div>` : ''}</div><div class="post-info"><div class="post-title">${post.title}</div><div class="post-date">${new Date(post.date).toLocaleDateString()}</div></div></div>`; }).join('')}</div></section>`;
+        }
+
+        function toggleLike(e, menuType, index) {
+            e.stopPropagation();
+            const post = galleryPosts[menuType][index];
+            if (!post) return;
+            
+            post.isLiked = !post.isLiked;
+            if (!post.likeCount) post.likeCount = 0;
+            post.likeCount += post.isLiked ? 1 : -1;
+            
+            // 로컬 스토리지에 좋아요 상태 저장
+            if (post.id) {
+                let likedLikes = [];
+                try {
+                    likedLikes = JSON.parse(localStorage.getItem('minihompy_likes') || '[]');
+                } catch(err) {
+                    likedLikes = [];
+                }
+                if (!Array.isArray(likedLikes)) likedLikes = [];
+                
+                if (post.isLiked) {
+                    if (!likedLikes.includes(post.id)) {
+                        likedLikes.push(post.id);
+                    }
+                } else {
+                    likedLikes = likedLikes.filter(id => id !== post.id);
+                }
+                localStorage.setItem('minihompy_likes', JSON.stringify(likedLikes));
+            }
+            
+            // 즉시 화면 반영 (낙관적 렌더링)
+            renderCustomPage(menuType);
+            
+            // 백그라운드 비동기로 DB에 업데이트
+            if (post.id) {
+                fetch(`${CONFIG.API_BASE_URL}/homepage/posts/${post.id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({like_count: post.likeCount})
+                }).catch(err => console.error("좋아요 업데이트 실패:", err));
+            }
+        }
+        function openWriteForm() { viewState = 'write'; tempImages = []; renderCustomPage(currentTab); }
+        async function refreshComments(menuType, postIndex) {
+            const post = galleryPosts[menuType][postIndex];
+            if (post && post.id) {
+                try {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/comments?post_id=${post.id}`);
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        post.comments = result.data.map(c => ({
+                            id: c.id,
+                            user: c.writer_name,
+                            content: c.content,
+                            isPrivate: c.is_private,
+                            replyTo: c.reply_to,
+                            date: c.created_at
+                        }));
+                    }
+                } catch(err) {
+                    console.error("댓글 갱신 실패:", err);
+                }
+            }
+        }
+
+        async function openReadView(index) {
+            viewState = 'read';
+            currentPostIndex = index;
+            await refreshComments(currentTab, index);
+            renderCustomPage(currentTab);
+        }
+        function closeView() { viewState = 'list'; renderCustomPage(currentTab); }
+
+        function renderWriteForm(menuType, preservedData = null) {
+            const isEdit = viewState === 'edit'; let title = '', content = '';
+            if (preservedData) { title = preservedData.title; content = preservedData.content; } 
+            else if (isEdit) { const post = galleryPosts[menuType][currentPostIndex]; title = post.title; content = post.content; }
+            if (isEdit && !preservedData && tempImages.length === 0) { tempImages = [...galleryPosts[menuType][currentPostIndex].images]; }
+            const container = document.getElementById('custom-page-content');
+            container.innerHTML = `<section class="write-view"><h3 class="section-title">${isEdit ? '수정하기' : '글쓰기'}</h3><div class="write-form"><div class="input-group"><label>제목</label><input type="text" id="post-title" value="${title}"></div><div class="input-group"><label>내용</label><textarea id="post-content">${content}</textarea></div><div class="input-group"><label>사진 첨부</label><div class="file-upload-area" onclick="document.getElementById('post-photos').click()"><i class="fa-solid fa-cloud-arrow-up"></i><span>사진 선택</span></div><input type="file" id="post-photos" multiple accept="image/*" style="display:none;" onchange="handleTempPhotos(event)"><div id="temp-photo-preview" class="temp-preview-grid">${tempImages.map((img, i) => `<div class="preview-item"><img src="${img}"><button class="remove-img" onclick="removeTempImg(${i})">&times;</button></div>`).join('')}</div></div><div style="display:flex; gap:10px; justify-content:flex-end; mt:20px; padding-top:20px;"><button class="btn-cancel" onclick="closeView()" style="padding:10px 25px;">취소</button><button class="btn-add" onclick="savePost('${menuType}')" style="padding:10px 25px;">저장하기</button></div></div></section>`;
+        }
+
+        function renderReadView(menuType, index) {
+            const post = galleryPosts[menuType][index]; const container = document.getElementById('custom-page-content');
+            const comments = post.comments || [];
+            container.innerHTML = `<section class="read-view"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; mb:15px; margin-bottom:15px;"><h3 class="read-title" style="margin:0;">${post.title}</h3><div style="display:flex; align-items:center; gap:12px;"><div style="display:flex; align-items:center; gap:5px; color:#ff5252; font-weight:bold;"><div class="heart-read ${post.isLiked ? 'active' : ''}" onclick="toggleLike(event, '${menuType}', ${index}); renderReadView('${menuType}', ${index});"><i class="${post.isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i></div><span>${post.likeCount || 0}</span></div><span style="font-size:0.8rem; color:#999;">${new Date(post.date).toLocaleString()}</span></div></div><div class="read-content" style="min-height:100px; line-height:1.6; color:#555; mb:20px; margin-bottom:20px;">${post.content.replace(/\n/g, '<br>')}</div><div style="display:flex; flex-direction:column; gap:15px; mb:30px; margin-bottom:30px;">${post.images.map(img => `<img src="${img}" style="width:100%; border-radius:10px; border:1px solid #eee;">`).join('')}</div><div class="post-comments-area" style="border-top:2px solid #eee; padding-top:20px; margin-bottom:20px;"><h4 style="font-size:0.9rem; margin-bottom:10px; color:var(--accent-blue);">댓글 <span style="font-weight:normal; color:#999;">(${comments.length})</span></h4><div class="comment-input-box" style="background:#f8f9fa; padding:12px; border-radius:8px; border:1px solid #eee; margin-bottom:15px;"><div style="display:flex; gap:10px;"><textarea id="post-comment-input" placeholder="댓글을 입력하세요..." style="flex:1; height:50px; border:1px solid #ddd; border-radius:6px; padding:8px; outline:none; resize:none; font-size:0.8rem;"></textarea><button onclick="addPostComment('${menuType}', ${index})" style="background:var(--accent-blue); color:#fff; border:none; padding:0 20px; border-radius:6px; font-weight:bold; cursor:pointer;">등록</button></div><div style="margin-top:8px;"><label style="font-size:0.75rem; color:#666; cursor:pointer; display:flex; align-items:center; gap:4px;"><input type="checkbox" id="comment-is-private"> <i class="fa-solid fa-lock" style="font-size:0.7rem;"></i> 비공개</label></div></div><div class="comments-list">${comments.length === 0 ? '<div style="text-align:center; color:#ccc; padding:20px; font-size:0.8rem;">아직 댓글이 없습니다.</div>' : comments.map((c, ci) => { const canSeePrivate = (currentUserNickname === c.user || currentUserNickname === homepageOwner); const isEditing = commentEditingIndex === ci; const isReplying = replyToIndex === ci; const canManage = (currentUserNickname === c.user || currentUserNickname === homepageOwner); return `<div class="comment-item" style="border-bottom:1px dashed #eee; padding:10px 0; ${c.replyTo ? 'margin-left:20px; border-left:2px solid #eee; padding-left:10px;' : ''}"><div style="display:flex; justify-content:space-between; margin-bottom:4px;"><div><span style="font-weight:bold; font-size:0.8rem; color:#555;">${c.replyTo ? '<span style="color:var(--accent-blue); margin-right:5px; font-weight:bold;">ㄴ</span>' : ''}${c.user}</span>${c.replyTo ? `<span style="font-size:0.7rem; color:var(--accent-blue); margin-left:5px;">@${c.replyTo}</span>` : ''}</div><span style="font-size:0.7rem; color:#999;">${new Date(c.date).toLocaleString()}</span></div><div style="font-size:0.8rem; color:#666; margin-bottom:5px;">${isEditing ? `<div style="display:flex; gap:5px;"><input type="text" id="edit-comment-val" value="${c.content}" style="flex:1; font-size:0.8rem; padding:4px; border:1px solid var(--accent-blue); border-radius:4px;"><button onclick="saveCommentEdit('${menuType}', ${index}, ${ci})" style="background:var(--accent-blue); color:#fff; border:none; border-radius:4px; padding:0 10px; font-size:0.7rem;">확인</button><button onclick="cancelCommentEdit()" style="border:none; background:none; color:#999; font-size:0.7rem; cursor:pointer;">취소</button></div>` : (c.isPrivate && !canSeePrivate ? '<i class="fa-solid fa-lock" style="font-size:0.7rem; color:#bbb;"></i> <span style="color:#aaa;">비밀 댓글입니다.</span>' : (c.isPrivate ? `<i class="fa-solid fa-lock-open" style="font-size:0.7rem; color:var(--accent-blue);"></i> ${c.content}` : c.content))}</div><div class="comment-actions" style="display:flex; gap:10px; font-size:0.7rem; color:#aaa;"><span style="cursor:pointer;" onclick="setReply(${ci})">답글</span>${canManage && !isEditing ? `<span style="cursor:pointer;" onclick="startCommentEdit(${ci})">수정</span>` : ''}${canManage ? `<span style="cursor:pointer;" onclick="deletePostComment('${menuType}', ${index}, ${ci})">삭제</span>` : ''}</div>${isReplying ? `<div class="inline-reply-form" style="margin-top:10px; padding:10px; background:#f0f8ff; border-radius:6px; border:1px solid #d0e8ff;"><div style="display:flex; gap:8px; align-items:center;"><span style="color:var(--accent-blue); font-weight:bold;">ㄴ</span><input type="text" id="inline-reply-input" placeholder="${c.user}님께 답글..." style="flex:1; font-size:0.8rem; padding:6px; border:1px solid #ddd; border-radius:4px; outline:none;"><button onclick="addInlineReply('${menuType}', ${index}, ${ci})" style="background:var(--accent-blue); color:#fff; border:none; padding:5px 12px; border-radius:4px; font-size:0.75rem; font-weight:bold; cursor:pointer;">확인</button><button onclick="cancelReply()" style="background:#eee; color:#666; border:none; padding:5px 12px; border-radius:4px; font-size:0.75rem; cursor:pointer;">취소</button></div></div>` : ''}</div>`; }).join('') }</div></div><div style="display:flex; justify-content:space-between; border-top:1px solid #eee; pt:20px; padding-top:20px;"><button class="btn-cancel" onclick="closeView()"><i class="fa-solid fa-list"></i> 목록</button><div style="display:flex; gap:10px;"><button class="btn-edit" onclick="startEditPost(${index})" style="padding:8px 20px;">수정</button><button class="btn-delete" onclick="deletePost('${menuType}', ${index})" style="padding:8px 20px;">삭제</button></div></div></section>`;
+        }
+
+        function setReply(index) { replyToIndex = index; commentEditingIndex = -1; renderReadView(currentTab, currentPostIndex); setTimeout(() => document.getElementById('inline-reply-input')?.focus(), 50); }
+        function cancelReply() { replyToIndex = -1; renderReadView(currentTab, currentPostIndex); }
+        function startCommentEdit(index) { commentEditingIndex = index; replyToIndex = -1; renderReadView(currentTab, currentPostIndex); setTimeout(() => document.getElementById('edit-comment-val')?.focus(), 50); }
+        function cancelCommentEdit() { commentEditingIndex = -1; renderReadView(currentTab, currentPostIndex); }
+
+        async function addInlineReply(menuType, postIndex, targetCi) {
+            const input = document.getElementById('inline-reply-input');
+            const content = input.value.trim();
+            if (!content) return;
+            
+            const post = galleryPosts[menuType][postIndex];
+            const targetUser = post.comments[targetCi].user;
+            
+            if (!memberId || !post.id) return;
+            
+            const commentData = {
+                member_id: memberId,
+                post_id: post.id,
+                menu_id: menuType,
+                user: currentUserNickname,
+                content: content,
+                reply_to: targetUser,
+                isPrivate: false
+            };
+            
+            replyToIndex = -1;
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(commentData)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    await refreshComments(menuType, postIndex);
+                    renderReadView(menuType, postIndex);
+                }
+            } catch (err) {
+                console.error("Add Reply Error:", err);
+            }
+        }
+
+        async function saveCommentEdit(menuType, postIndex, commentIndex) {
+            const newVal = document.getElementById('edit-comment-val').value.trim();
+            if (!newVal) return;
+            
+            const post = galleryPosts[menuType][postIndex];
+            const comment = post.comments[commentIndex];
+            if (!comment.id) return alert("수정할 수 없는 댓글입니다.");
+            
+            commentEditingIndex = -1;
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/comments/${comment.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: newVal })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    await refreshComments(menuType, postIndex);
+                    renderReadView(menuType, postIndex);
+                }
+            } catch (err) {
+                console.error("Edit Comment Error:", err);
+            }
+        }
+
+        async function deletePostComment(menuType, postIndex, commentIndex) {
+            if (!confirm('댓글을 삭제할까요?')) return;
+            
+            const post = galleryPosts[menuType][postIndex];
+            const comment = post.comments[commentIndex];
+            if (!comment.id) return alert("삭제할 수 없는 댓글입니다.");
+            
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/comments/${comment.id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    await refreshComments(menuType, postIndex);
+                    renderReadView(menuType, postIndex);
+                }
+            } catch (err) {
+                console.error("Delete Comment Error:", err);
+            }
+        }
+
+        async function addPostComment(menuType, postIndex) {
+            const input = document.getElementById('post-comment-input');
+            const isPrivate = document.getElementById('comment-is-private').checked;
+            const content = input.value.trim();
+            if (!content) return;
+            
+            const post = galleryPosts[menuType][postIndex];
+            if (!memberId || !post.id) return alert("로그인이 필요하거나 게시글 정보가 유효하지 않습니다.");
+            
+            const commentData = {
+                member_id: memberId,
+                post_id: post.id,
+                menu_id: menuType,
+                user: currentUserNickname,
+                content: content,
+                isPrivate: isPrivate
+            };
+            
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(commentData)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    input.value = '';
+                    document.getElementById('comment-is-private').checked = false;
+                    await refreshComments(menuType, postIndex);
+                    renderReadView(menuType, postIndex);
+                }
+            } catch (err) {
+                console.error("Add Comment Error:", err);
+            }
+        }
+        function startEditPost(index) { viewState = 'edit'; currentPostIndex = index; tempImages = []; renderCustomPage(currentTab); }
+        function removeTempImg(i) { const title = document.getElementById('post-title').value; const content = document.getElementById('post-content').value; tempImages.splice(i, 1); renderWriteForm(currentTab, { title, content }); }
+        function handleTempPhotos(e) { const title = document.getElementById('post-title').value; const content = document.getElementById('post-content').value; const files = e.target.files; let loadedCount = 0; const totalFiles = files.length; Array.from(files).forEach(file => { const reader = new FileReader(); reader.onload = (ev) => { tempImages.push(ev.target.result); loadedCount++; if (loadedCount === totalFiles) { renderWriteForm(currentTab, { title, content }); } }; reader.readAsDataURL(file); }); }
+        async function savePost(menuType) { const title = document.getElementById('post-title').value.trim(); const content = document.getElementById('post-content').value.trim(); if (!title) { alert('제목을 입력하세요!'); return; } if (!memberId) { alert('로그인이 필요합니다.'); return; } const postData = { member_id: memberId, menu_id: menuType, title: title, content: content, images: JSON.stringify(tempImages), like_count: 0, comments: "[]" }; try { if (viewState === 'edit') { const post = galleryPosts[menuType][currentPostIndex]; postData.like_count = post.likeCount; postData.comments = JSON.stringify(post.comments); await fetch(`${CONFIG.API_BASE_URL}/homepage/posts/${post.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(postData) }); } else { await fetch(`${CONFIG.API_BASE_URL}/homepage/posts`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(postData) }); } await loadPosts(); viewState = 'list'; renderCustomPage(menuType); } catch (err) { console.error(err); alert("게시글 저장에 실패했습니다."); } }
+        async function deletePost(menuType, index) { if (!confirm('삭제할까요?')) return; const post = galleryPosts[menuType][index]; if(post.id) { try { await fetch(`${CONFIG.API_BASE_URL}/homepage/posts/${post.id}`, { method: 'DELETE' }); await loadPosts(); closeView(); } catch(e) { console.error(e); } } }
+        async function addCustomMenu() { const nameInput = document.getElementById('new-menu-name'); const name = nameInput.value.trim(); const visibility = document.querySelector('input[name="privacy"]:checked').value; if (!name) return; if (customMenus.some(m => m.name === name)) { alert('이미 존재하는 이름입니다.'); return; } const newType = 'temp_' + Date.now(); customMenus.push({ name, type: newType, isFixed: false, visibility }); renderMenus(); nameInput.value = ''; }
+        function startEdit(index) { editingIndex = index; renderMenus(); }
+        function cancelEdit() { editingIndex = -1; renderMenus(); }
+        async function saveEdit(index) { const newName = document.getElementById('edit-menu-name').value.trim(); if (!newName) return; customMenus[index].name = newName; editingIndex = -1; renderMenus(); }
+        async function deleteCustomMenu(index) { if (customMenus[index].isFixed) return; const removed = customMenus.splice(index, 1)[0]; if (currentTab === removed.type) currentTab = 'home'; delete galleryPosts[removed.type]; renderMenus(); }
+        async function saveAndRender() {
+            savedMenus = JSON.parse(JSON.stringify(customMenus));
+            // 로컬 스토리지 백업 제거 (오프라인 대비 제거하고 DB만 의존)
+            
+            // DB 저장
+            if (memberId) {
+                try {
+                    const titleInput = document.getElementById('hp-title-input');
+                    const currentTitle = titleInput ? titleInput.value.trim() : document.getElementById('page-title').innerText;
+                    const visibility = document.querySelector('input[name="hp-visibility"]:checked')?.value || 'public';
+                    const menuOrderList = customMenus.map(m => m.type).join(',');
+                    
+                    await fetch(`${CONFIG.API_BASE_URL}/homepage/save-settings`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            member_id: memberId,
+                            title: currentTitle,
+                            visibility: visibility,
+                            menus_order: menuOrderList
+                        })
+                    });
+                    
+                    const onlyCustoms = customMenus.filter(m => !m.isFixed).map(m => ({
+                        id: m.id, // 기존 메뉴면 UUID 존재, 새 메뉴면 없음
+                        name: m.name,
+                        visibility: m.visibility
+                    }));
+                    await fetch(`${CONFIG.API_BASE_URL}/homepage/menus`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            member_id: memberId,
+                            menus: onlyCustoms
+                        })
+                    });
+                    
+                    // DB 저장 후 UUID가 새로 발급되었을 수 있으므로 다시 불러옴
+                    // 새로 저장된 순서를 프론트 전역 변수에 먼저 업데이트
+                    window.savedMenuOrder = customMenus.map(m => m.type);
+                    await loadMenus();
+                } catch (err) {
+                    console.error("DB Save Error:", err);
+                }
+            }
+            renderMenus();
+        }
+
+        async function saveMenuSettings() {
+            await saveAndRender();
+            alert("[저장되었습니다]");
+        }
+
+        async function sendAiMessage() {
+            const input = document.getElementById('ai-input'); const container = document.getElementById('ai-chat-messages'); const message = input.value.trim(); if (!message) return;
+            const userDiv = document.createElement('div'); userDiv.className = 'user-msg'; userDiv.innerText = message; container.appendChild(userDiv); input.value = ''; container.scrollTop = container.scrollHeight;
+            const loadingDiv = document.createElement('div'); loadingDiv.className = 'ai-msg loading'; loadingDiv.innerText = '...'; container.appendChild(loadingDiv);
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/homepage/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: message, persona: "츤데레 감성", context: "싸이월드 미니홈피 환경" }) });
+                const result = await response.json(); container.removeChild(loadingDiv);
+                const aiDiv = document.createElement('div'); aiDiv.className = 'ai-msg'; aiDiv.innerText = result.reply || "미안, 지금은 부끄러워서 말을 못 하겠어.."; container.appendChild(aiDiv); container.scrollTop = container.scrollHeight;
+            } catch (error) { console.error("AI 오류:", error); if (loadingDiv.parentNode) container.removeChild(loadingDiv); const errorDiv = document.createElement('div'); errorDiv.className = 'ai-msg'; errorDiv.innerText = "나중에 다시 말 걸어줘!"; container.appendChild(errorDiv); }
+        }
+    </script>
+</body>
+</html>

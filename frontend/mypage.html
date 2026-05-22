@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 | DearZit</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="landing.css">
+    
+    <link rel="icon" href="favicon.ico">
+    
+    <!-- 3D 모델 뷰어 (Google Model Viewer) & Meshopt 디코더 -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    <!-- Meshopt: UMD 로드 후 model-viewer에 연결 -->
+    <script src="https://cdn.jsdelivr.net/npm/meshoptimizer@0.18.1/meshopt_decoder.js"></script>
+    <script>
+        // model-viewer가 등록된 후 MeshoptDecoder 연결
+        customElements.whenDefined('model-viewer').then(() => {
+            if (typeof MeshoptDecoder !== 'undefined') {
+                customElements.get('model-viewer').meshoptDecoder = MeshoptDecoder;
+                console.log('[MeshoptDecoder] Connected to model-viewer');
+            }
+        });
+    </script>
+</head>
+<body>
+    
+    <header class="main-header">
+        <div class="wide-container" style="display: flex; align-items: center; justify-content: space-between; width: 100%; height: 100%;">
+            <a href="/index.html" class="logo" style="text-decoration: none;">
+                <i class="fa-solid fa-cube"></i>
+                <span>DearZit</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/notice.html">공지사항</a></li>
+                    <li><a href="/about.html">디어지트란?</a></li>
+                    <li><a href="/agit.html">홈피들</a></li>
+                    <li><a href="/community.html">소통게시판</a></li>
+                    <li><a href="/support.html">고객지원</a></li>
+                    <li class="nav-admin">
+                        <a href="/admin.html" target="_blank" id="admin-link" style="text-decoration: none; color: #fff; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 800; transition: 0.3s; background: #ff0000; display: inline-block;">관리자</a>
+                    </li>
+                </ul>
+            </nav>
+            <div id="auth-nav" class="auth-nav"></div>
+        </div>
+    </header>
+
+
+    <div id="landing-wrapper">
+        <main style="background: #fdfdfd; min-height: calc(100vh - 160px); padding: 40px 0;">
+            <div class="wide-container">
+                <!-- 캐릭터 생성 섹션 -->
+                <div id="section-character" class="mypage-section-content" style="display: block;">
+                    <div style="background: #fff; border: 2px solid #000; padding: 40px; border-radius: var(--border-radius); box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;">AI 내 캐릭터 생성기</h3>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">나의 성향과 어울리는 맞춤형 미니미 캐릭터를 AI로 자동 생성합니다.</p>
+                        </div>
+                        
+                        <div style="display: flex; gap: 40px; min-height: 400px; flex-wrap: wrap;">
+                            <!-- 왼쪽: 빈칸 (캐릭터 프리뷰 박스) -->
+                            <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-sub); border: 2px dashed #cbd5e1; border-radius: 12px; padding: 30px; position: relative;">
+                                <div id="avatar-preview-box" style="width: 250px; height: 300px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                                    <!-- 빈칸 플레이스홀더 -->
+                                    <div id="avatar-placeholder" style="text-align: center; color: #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                        <i class="fa-regular fa-user" style="font-size: 4rem; margin-bottom: 15px; display: block; color: #cbd5e1;"></i>
+                                        <span style="font-size: 0.85rem; font-weight: 600;">생성된 캐릭터가 없습니다</span>
+                                    </div>
+                                    <!-- 진짜 3D 모델 뷰어 -->
+                                    <model-viewer 
+                                        id="avatar-preview-3d" 
+                                        src="" 
+                                        alt="A 3D model of your customized avatar" 
+                                        auto-rotate 
+                                        camera-controls 
+                                        interaction-prompt="auto"
+                                        shadow-intensity="1" 
+                                        style="width: 100%; height: 100%; display: none; cursor: grab;">
+                                    </model-viewer>
+                                </div>
+                                <div style="margin-top: 20px; text-align: center;">
+                                    <span style="font-size: 0.9rem; font-weight: 800; color: var(--text-main);">나만의 미니미 캐릭터</span>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">마우스로 클릭해서 옆으로 돌려보세요!</p>
+                                </div>
+                                </div>
+                                
+                                <!-- 로딩 오버레이 -->
+                                <div id="avatar-loading" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; z-index: 10;">
+                                    <i class="fa-solid fa-wand-magic-sparkles fa-spin" style="font-size: 3rem; color: var(--accent-primary); margin-bottom: 15px;"></i>
+                                    <span style="font-weight: 800; font-size: 1rem; color: var(--text-main);">AI 캐릭터 분석 및 생성 중...</span>
+                                    <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">잠시만 기다려주세요 (약 3초 소요)</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 오른쪽: 두 가지 생성 버튼만 배치 -->
+                            <div style="flex: 1.2; min-width: 320px; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+                                <div style="text-align: center; margin-bottom: 15px;">
+                                    <h4 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">원클릭 AI 캐릭터 생성</h4>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">내 실제 얼굴 사진을 이용해 싱크로율 높은 도트 캐릭터를 만들거나,<br>AI에게 원하는 스타일을 설명하여 세상에 하나뿐인 아바타를 제작해보세요.</p>
+                                </div>
+
+                                <!-- 숨겨진 파일 인풋 -->
+                                <input type="file" id="hidden-photo-input" accept="image/*" style="display: none;" onchange="handlePhotoSelected(event)">
+
+                                <!-- 사진으로 나만의 특별 캐릭터 생성하기 버튼 -->
+                                <button onclick="triggerPhotoGeneration()" style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; padding: 22px; border-radius: 12px; font-weight: 800; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: 0.3s; box-shadow: 0 4px 15px rgba(168,85,247,0.25);">
+                                    <i class="fa-solid fa-camera-retro" style="font-size: 1.3rem;"></i> 
+                                    사진으로 나만의 특별 캐릭터 생성하기
+                                </button>
+
+                                <!-- AI로 내 캐릭터 만들기 버튼 -->
+                                <button onclick="triggerAiPromptGeneration()" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #fff; border: none; padding: 22px; border-radius: 12px; font-weight: 800; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: 0.3s; box-shadow: 0 4px 15px rgba(15,23,42,0.15);">
+                                    <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 1.3rem;"></i> 
+                                    AI로 내 캐릭터 만들기
+                                </button>
+                                
+                                <div style="background: #f8fafc; border: 1px solid #f1f5f9; padding: 15px; border-radius: 8px; text-align: center; margin-top: 15px;">
+                                    <span style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; display: block;">
+                                        <i class="fa-solid fa-circle-info" style="color: var(--accent-primary);"></i> 생성된 캐릭터는 마이홈피 미니룸 및 프로필에 즉시 연동됩니다.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <style>
+            @keyframes slideUpFade {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.1); opacity: 0.8; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+            .btn-tool {
+                background: #fff; border: 1px solid #e0e0e0; padding: 10px 18px; border-radius: 8px;
+                font-size: 0.9rem; font-weight: 600; color: #555; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            }
+            .select-sort {
+                background: #fff; border: 1px solid #e0e0e0; padding: 10px 15px; border-radius: 8px;
+                font-size: 0.9rem; font-weight: 600; color: #555; cursor: pointer;
+            }
+            .btn-view {
+                background: #fff; border: none; padding: 10px 15px; font-size: 1.1rem; color: #aaa; cursor: pointer;
+            }
+            .btn-view.active { color: #000; background: #f0f0f0; }
+            .btn-history {
+                background: #fff; border: 1px solid #e0e0e0; padding: 10px 18px; border-radius: 8px;
+                font-size: 0.9rem; font-weight: 600; color: #555; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            }
+            .btn-new-folder {
+                background: #fff; border: 1px solid #e0e0e0; padding: 12px 25px; border-radius: 10px;
+                font-size: 1rem; font-weight: 700; color: #444; cursor: pointer; display: flex; align-items: center; gap: 10px;
+                width: fit-content; transition: 0.2s;
+            }
+            .btn-new-folder:hover { background: #f8f8f8; border-color: #ccc; }
+
+            .template-grid {
+                display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px;
+            }
+            .card {
+                background: #fff; border: 1px solid #eee; border-radius: 15px; overflow: hidden;
+                transition: 0.3s; cursor: pointer; position: relative; display: flex; flex-direction: column;
+            }
+            .card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+            
+            .create-card {
+                height: 350px; border: 2px solid var(--accent-primary); background: #fff;
+                display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+            }
+            .create-card .plus-icon {
+                width: 60px; height: 60px; border: 2px solid #ccc; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #555;
+            }
+            .create-card span { font-weight: 800; color: #000; font-size: 1.1rem; }
+            .create-card:hover { border-color: #000; background: #fafafa; }
+            .create-card:hover .plus-icon { border-color: #000; color: #000; }
+
+            .project-card { height: 350px; }
+            .card-thumb {
+                height: 220px; position: relative; overflow: hidden; display: flex; align-items: stretch;
+            }
+            .card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+            .page-count {
+                position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.8); color: #fff;
+                padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; z-index: 2;
+            }
+            .status-badge {
+                position: absolute; bottom: 15px; right: 15px; background: #00ffd0; color: #000;
+                padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; z-index: 2;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            }
+            .card-info { padding: 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+            .info-top { display: flex; justify-content: space-between; align-items: center; }
+            .title { font-size: 1.05rem; font-weight: 800; color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .actions { display: flex; gap: 12px; color: #aaa; font-size: 1.1rem; }
+            .actions i:hover { color: #000; }
+            .info-bottom { font-size: 0.85rem; color: #999; font-weight: 600; }
+        </style>
+
+        <footer class="landing-footer">
+            <p>&copy; 2026 DearZit Project. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="common.js"></script>
+    <script src="mypage.js"></script>
+</body>
+</html>

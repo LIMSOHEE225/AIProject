@@ -1,0 +1,173 @@
+/* Landing Page - Soft Premium Modern (Wide) */
+
+#landing-wrapper {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* --- Hero Section --- */
+.hero-section {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    padding: 120px 0;
+    gap: 60px;
+}
+
+.hero-title {
+    font-size: 5.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 30px;
+    letter-spacing: -3px;
+    color: var(--text-main);
+}
+
+.hero-title .highlight {
+    color: var(--accent-primary);
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 50px;
+}
+
+.btn-cta {
+    display: inline-block;
+    background: var(--accent-primary);
+    color: #fff;
+    padding: 22px 55px;
+    border-radius: 50px; /* Rounded pill style */
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.4s;
+    box-shadow: 0 15px 35px rgba(124, 58, 237, 0.25);
+}
+
+.btn-cta:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 20px 50px rgba(124, 58, 237, 0.35);
+}
+
+.hero-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.visual-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 30px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--glass-border);
+}
+
+.visual-card img {
+    width: 100%;
+    border-radius: 20px;
+    display: block;
+}
+
+/* --- Features Section --- */
+.features-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    padding: 120px 0;
+}
+
+.feature-item {
+    padding: 50px 40px;
+    background: #fff;
+    border-radius: 30px;
+    transition: 0.4s;
+    border: 1px solid transparent;
+}
+
+.feature-item:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent-primary);
+    transform: translateY(-10px);
+}
+
+.feature-item i {
+    font-size: 2.8rem;
+    color: var(--accent-primary);
+    margin-bottom: 30px;
+}
+
+.feature-item h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.feature-item p {
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+/* --- Auth Modal (Soft White) --- */
+.modal-overlay {
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(15px);
+}
+
+.modal-content {
+    background: #fff;
+    border: 1px solid var(--glass-border);
+    border-radius: 40px;
+    padding: 60px;
+    box-shadow: 0 50px 100px rgba(0, 0, 0, 0.1);
+}
+
+.auth-tabs {
+    background: var(--bg-sub);
+    padding: 6px;
+    border-radius: 20px;
+    display: inline-flex;
+    margin-bottom: 40px;
+}
+
+.auth-tabs button {
+    border: none;
+    background: transparent;
+    padding: 12px 30px;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.auth-tabs button.active {
+    background: #fff;
+    color: var(--accent-primary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.input-group input {
+    background: var(--bg-sub);
+    border: 1px solid transparent;
+    border-radius: 15px;
+    padding: 15px 20px;
+}
+
+.input-group input:focus {
+    background: #fff;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+/* Footer */
+.landing-footer {
+    padding: 80px 0;
+    text-align: center;
+    border-top: none; /* Light line removed */
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}

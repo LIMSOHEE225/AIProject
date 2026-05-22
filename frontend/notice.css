@@ -1,0 +1,84 @@
+/* Notice Page - Strict Grid & Minimal Flat (No Light Lines) */
+
+.notice-container {
+    padding: 80px 0;
+    max-width: var(--max-width);
+    margin: 0 auto;
+}
+
+.notice-search {
+    background: #fff;
+    border: 1px solid #000; /* Black Line instead of light */
+    padding: 12px 25px;
+    margin-bottom: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.notice-search input {
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    width: 300px;
+}
+
+/* --- Notice List Area --- */
+.notice-list {
+    background: transparent;
+    border: none; /* Light outer border removed */
+    padding: 0;
+}
+
+.notice-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid #000; /* Strict Black Grid */
+    background: #fff;
+}
+
+.notice-table th, .notice-table td {
+    padding: 18px;
+    border: 1px solid #000; /* Grid lines inside */
+    text-align: center;
+    vertical-align: middle;
+}
+
+.notice-table th {
+    background: #f8fafc;
+    font-weight: 800;
+}
+
+.col-id { width: 80px; }
+.col-cat { width: 120px; }
+.col-title { text-align: left !important; }
+.col-date { width: 150px; }
+.col-author { width: 120px; }
+
+/* --- Pagination (No Lines) --- */
+.pagination {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.pagination button {
+    background: transparent;
+    border: none; /* No border lines */
+    font-size: 1.3rem;
+    font-weight: 800;
+    cursor: pointer;
+    color: #000;
+    padding: 10px;
+    transition: 0.2s;
+}
+
+.pagination button.active {
+    color: var(--accent-primary);
+    text-decoration: underline;
+    text-underline-offset: 8px;
+}
+
+.badge { font-weight: 800; font-size: 0.8rem; }
+.title-cell a { text-decoration: none; color: #000; font-weight: 600; }

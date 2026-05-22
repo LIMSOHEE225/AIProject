@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 | DearZit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="landing.css">
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: calc(100vh - 80px);
+            background: #f8fafc;
+        }
+        .admin-sidebar {
+            background: #fff;
+            border-right: 2px solid #000;
+            padding: 30px 0;
+        }
+        .admin-menu-item {
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .admin-menu-item:hover {
+            background: #f1f5f9;
+            color: #000;
+        }
+        .admin-menu-item.active {
+            color: #000;
+            background: #f1f5f9;
+            border-right: 4px solid #000;
+        }
+        .admin-content {
+            padding: 40px;
+        }
+        .admin-card {
+            background: #fff;
+            border: 2px solid #000;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0 #000;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .admin-table th, .admin-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .admin-table th {
+            font-weight: 800;
+            color: #000;
+            border-bottom: 2px solid #000;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #000;
+            transition: 0.2s;
+        }
+        .btn-edit { background: #fff; color: #000; }
+        .btn-delete { background: #ff0000; color: #fff; border: none; }
+        .btn-edit:hover { background: #000; color: #fff; }
+        .btn-delete:hover { opacity: 0.8; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <header class="main-header" style="border-bottom: 2px solid #000; height: 80px;">
+        <div class="wide-container" style="display: flex; align-items: center; justify-content: space-between; width: 100%; height: 100%;">
+            <a href="#" class="logo" style="text-decoration: none; pointer-events: none;">
+                <i class="fa-solid fa-cube"></i>
+                <span>DearZit Admin</span>
+            </a>
+            <div style="font-weight: 800; font-size: 0.9rem; color: #64748b;">Administrator Mode</div>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-menu-item" onclick="showTab('basecodes', this)">
+                <i class="fa-solid fa-code"></i> 기초코드 등록
+            </div>
+            <div style="border-bottom: 2px solid #e2e8f0; margin: 10px 0 20px 0;"></div>
+            
+            <div class="admin-menu-item active" onclick="showTab('notices', this)">
+                <i class="fa-solid fa-bullhorn"></i> 공지사항 관리
+            </div>
+            <div class="admin-menu-item" onclick="showTab('members', this)">
+                <i class="fa-solid fa-users-gear"></i> 회원 관리
+            </div>
+            <div class="admin-menu-item" onclick="showTab('posts', this)">
+                <i class="fa-solid fa-file-lines"></i> 게시글 관리
+            </div>
+            <div class="admin-menu-item" onclick="showTab('shopping', this)">
+                <i class="fa-solid fa-cart-shopping"></i> 아이템 쇼핑 등록
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <!-- 기초코드 등록 -->
+            <div id="tab-basecodes" class="tab-content">
+                <div class="admin-card">
+                    <h2 style="font-weight: 900; font-size: 1.8rem; margin-bottom: 20px;">기초코드 등록</h2>
+                    <p style="color: #64748b; margin-bottom: 30px;">시스템에서 공통으로 사용되는 기초코드(카테고리, 상태값 등)를 관리합니다.</p>
+                    
+                    <div style="background: #f8fafc; padding: 25px; border: 2px solid #e2e8f0; border-radius: 15px; margin-bottom: 30px;">
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div style="display: flex; gap: 15px;">
+                                <select id="base-code-group" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; width: 200px; font-family: inherit;">
+                                    <option value="">-- 코드 그룹 선택 --</option>
+                                    <option value="ITEM_CAT">아이템 카테고리</option>
+                                    <option value="USER_ROLE">사용자 권한</option>
+                                    <option value="POST_CAT">게시판 카테고리</option>
+                                </select>
+                                <input type="text" id="base-code-id" placeholder="코드 ID (예: ITEM_01)" style="width: 150px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-family: inherit;">
+                                <input type="text" id="base-code-name" placeholder="코드명 (예: 스킨)" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-family: inherit;">
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                                <button onclick="alert('기초코드 등록 기능 준비중')" class="btn-sm" style="padding: 10px 20px; background: #3b82f6; border: none; color: #fff; border-radius: 8px; cursor:pointer;">코드 등록하기</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>그룹</th>
+                                <th>코드 ID</th>
+                                <th>코드명</th>
+                                <th>사용여부</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="base-code-list">
+                            <tr><td colspan="5" style="text-align:center; padding:40px;">등록된 기초코드가 없습니다.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 공지사항 관리 -->
+            <div id="tab-notices" class="tab-content active">
+                <div class="admin-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <div>
+                            <h2 style="font-weight: 900; font-size: 2rem; margin-bottom: 5px;">공지사항 목록</h2>
+                            <p style="color: #64748b;">시스템 전체 공지사항을 관리합니다.</p>
+                        </div>
+                        <button id="btn-show-notice-form" class="btn-sm" style="background: #000; color: #fff; padding: 12px 25px; border-radius: 10px;">새 공지 등록</button>
+                    </div>
+
+                    <!-- 새 공지 등록 폼 (기본 숨김) -->
+                    <div id="notice-form-container" style="display: none; background: #f8fafc; padding: 25px; border: 2px solid #e2e8f0; border-radius: 15px; margin-bottom: 30px;">
+                        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 20px;"><i class="fa-solid fa-pen-nib"></i> 새 공지사항 등록</h3>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div style="display: flex; gap: 15px;">
+                                <select id="notice-type" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; width: 150px; font-family: inherit;">
+                                    <option value="공지">공지</option>
+                                    <option value="업데이트">업데이트</option>
+                                    <option value="이벤트">이벤트</option>
+                                </select>
+                                <input type="text" id="notice-title" placeholder="공지 제목을 입력하세요" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-family: inherit;">
+                            </div>
+                            <textarea id="notice-content" rows="6" placeholder="공지 내용을 입력하세요" style="padding: 15px; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; outline: none; font-family: inherit; line-height: 1.6;"></textarea>
+                            <div style="margin-top: 5px;">
+                                <label style="font-size: 0.9rem; font-weight: 700; display: block; margin-bottom: 5px; color: #475569;">첨부파일 (선택)</label>
+                                <input type="file" id="notice-file" style="padding: 10px; border: 1px dashed #cbd5e1; border-radius: 8px; width: 100%; font-family: inherit; background: #fff;">
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                                <button id="btn-cancel-notice" class="btn-sm" style="padding: 10px 20px; background: #e2e8f0; border: none; color: #475569;">취소</button>
+                                <button id="btn-submit-notice" class="btn-sm" style="padding: 10px 20px; background: #3b82f6; border: none; color: #fff;">등록하기</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>번호</th>
+                                <th style="width: 50%;">제목</th>
+                                <th>작성일</th>
+                                <th>조회수</th>
+                                <th style="text-align: right;">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notice-list">
+                            <!-- 데이터 로드 영역 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 회원 관리 -->
+            <div id="tab-members" class="tab-content">
+                <div class="admin-card">
+                    <h2 style="font-weight: 900; font-size: 1.8rem; margin-bottom: 20px;">전체 회원 관리</h2>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>닉네임</th>
+                                <th>이메일</th>
+                                <th>권한</th>
+                                <th>가입일</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="member-list">
+                            <tr><td colspan="5" style="text-align:center; padding:40px;">데이터를 불러오는 중...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 게시글 관리 -->
+            <div id="tab-posts" class="tab-content">
+                <div class="admin-card">
+                    <h2 style="font-weight: 900; font-size: 1.8rem; margin-bottom: 20px;">커뮤니티 게시글 관리</h2>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>제목</th>
+                                <th>작성자</th>
+                                <th>날짜</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="post-list">
+                            <tr><td colspan="5" style="text-align:center; padding:40px;">데이터를 불러오는 중...</td></tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- 게시글 보기 모달 -->
+                    <div id="post-view-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+                        <div style="background:#fff; width:600px; max-width:90%; border-radius:15px; padding:30px; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
+                                <h3 id="post-view-title" style="font-size:1.5rem; font-weight:800; margin:0;">게시글 제목</h3>
+                                <button onclick="document.getElementById('post-view-modal').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                            </div>
+                            <div style="margin-bottom:20px; font-size:0.9rem; color:#64748b; display:flex; justify-content:space-between;">
+                                <span>작성자: <span id="post-view-author" style="font-weight:700; color:#000;"></span></span>
+                                <span>작성일: <span id="post-view-date"></span></span>
+                            </div>
+                            <div id="post-view-content" style="min-height:150px; background:#f8fafc; padding:20px; border-radius:8px; line-height:1.6; white-space:pre-wrap; border:1px solid #e2e8f0; max-height:400px; overflow-y:auto;">
+                                게시글 내용
+                            </div>
+                            
+                            <!-- 댓글 영역 추가 -->
+                            <div style="margin-top: 20px; border-top: 2px dashed #e2e8f0; padding-top: 20px;">
+                                <h4 style="font-weight: 800; font-size: 1.1rem; margin-bottom: 15px;">등록된 댓글</h4>
+                                <div id="post-view-comments" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+                                    <!-- 댓글 목록 렌더링 -->
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top:20px; text-align:center;">
+                                <button onclick="document.getElementById('post-view-modal').style.display='none'" class="btn-sm" style="background:#3b82f6; color:#fff; padding:10px 30px; border:none; border-radius:8px;">닫기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 아이템 쇼핑 등록 -->
+            <div id="tab-shopping" class="tab-content">
+                <div style="padding: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <div>
+                            <h2 style="font-weight: 900; font-size: 2rem; margin-bottom: 5px;">아이템 쇼핑 등록</h2>
+                            <p style="color: #64748b;">미니홈피 꾸미기를 위한 새로운 아이템을 관리합니다.</p>
+                        </div>
+                        <button onclick="document.getElementById('shopping-form-container').style.display='block'" class="btn-sm" style="background: #000; color: #fff; padding: 12px 25px; border-radius: 10px; cursor: pointer;">새 아이템 등록</button>
+                    </div>
+                    
+                    <div id="shopping-form-container" style="display: none; background: #f8fafc; padding: 25px; border: 2px solid #e2e8f0; border-radius: 15px; margin-bottom: 30px;">
+                        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 20px;"><i class="fa-solid fa-plus"></i> 새 쇼핑 아이템 등록</h3>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div style="display: flex; gap: 15px;">
+                                <select id="shop-item-category" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; width: 150px; font-family: inherit;">
+                                    <option value="skin">스킨</option>
+                                    <option value="music">배경음악</option>
+                                    <option value="minime">미니미</option>
+                                    <option value="font">글꼴</option>
+                                </select>
+                                <input type="text" id="shop-item-name" placeholder="아이템 이름" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-family: inherit;">
+                                <input type="number" id="shop-item-price" placeholder="가격 (도토리)" style="width: 150px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-family: inherit;">
+                            </div>
+                            <input type="text" id="shop-item-image" placeholder="아이템 이미지 URL" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-family: inherit;">
+                            <textarea id="shop-item-desc" rows="3" placeholder="아이템 상세 설명" style="padding: 15px; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; outline: none; font-family: inherit; line-height: 1.6;"></textarea>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                                <button onclick="document.getElementById('shopping-form-container').style.display='none';" class="btn-sm" style="padding: 10px 20px; background: #e2e8f0; border: none; color: #475569; border-radius: 8px; cursor:pointer;">취소</button>
+                                <button onclick="alert('아이템 쇼핑 등록 기능 준비중')" class="btn-sm" style="padding: 10px 20px; background: #3b82f6; border: none; color: #fff; border-radius: 8px; cursor:pointer;">등록하기</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>카테고리</th>
+                                <th>아이템명</th>
+                                <th>가격</th>
+                                <th>상태</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shop-item-list">
+                            <tr><td colspan="5" style="text-align:center; padding:40px;">등록된 아이템이 없습니다.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="common.js"></script>
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.admin-menu-item').forEach(m => m.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if(tabId === 'members') loadMembers();
+            if(tabId === 'posts') loadPosts();
+            if(tabId === 'notices') loadNotices();
+        }
+
+        async function loadMembers() {
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/auth/members`);
+                const result = await res.json();
+                const tbody = document.getElementById('member-list');
+                if(result.status === 'success') {
+                    tbody.innerHTML = result.data.map(m => {
+                        const currentRole = m.role || '회원';
+                        const roleColor = currentRole === '관리자' ? '#fca5a5' : '#e2e8f0';
+                        const date = m.created_at ? m.created_at.split('T')[0] : '';
+                        
+                        return `
+                        <tr>
+                            <td>${m.nickname || '익명'}</td>
+                            <td>${m.email}</td>
+                            <td><span style="background:${roleColor}; padding:4px 8px; border-radius:4px; font-size:0.8rem;">${currentRole}</span></td>
+                            <td>${date}</td>
+                            <td>
+                                <button class="btn-sm btn-edit" onclick="alert('정보 수정 기능 준비중')">수정</button>
+                                <button class="btn-sm btn-edit" onclick="toggleRole('${m.id}', '${currentRole}')">${currentRole === '관리자' ? '권한취소' : '권한부여'}</button>
+                                <button class="btn-sm btn-delete" onclick="alert('탈퇴 처리 기능 준비중')">탈퇴</button>
+                            </td>
+                        </tr>
+                        `;
+                    }).join('');
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function toggleRole(userId, currentRole) {
+            const newRole = currentRole === '관리자' ? '회원' : '관리자';
+            if (!confirm(`해당 사용자의 권한을 '${newRole}'(으)로 변경하시겠습니까?`)) return;
+
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/auth/members/${userId}/role`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: newRole })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    alert('권한이 변경되었습니다.');
+                    loadMembers(); // 목록 새로고침
+                } else {
+                    alert('권한 변경 실패: ' + (data.message || data.detail || '알 수 없는 오류'));
+                }
+            } catch (e) {
+                console.error(e);
+                alert('서버와 통신 중 오류가 발생했습니다.');
+            }
+        }
+
+        let loadedPosts = [];
+
+        async function loadPosts() {
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/community/posts`);
+                const posts = await res.json();
+                loadedPosts = posts;
+                const tbody = document.getElementById('post-list');
+                
+                if (posts.length > 0) {
+                    tbody.innerHTML = posts.map(p => `
+                        <tr>
+                            <td style="font-weight:700;">${p.title}</td>
+                            <td>${p.author_nickname || '익명'}</td>
+                            <td>${p.created_at ? p.created_at.split('T')[0] : ''}</td>
+                            <td>
+                                <button class="btn-sm btn-edit" onclick="viewPost('${p.id}')">보기</button>
+                                <button class="btn-sm btn-delete" onclick="alert('삭제 기능 준비중')">삭제</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">등록된 게시글이 없습니다.</td></tr>';
+                }
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('post-list').innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">데이터를 불러오는데 실패했습니다.</td></tr>';
+            }
+        }
+
+        async function viewPost(id) {
+            const post = loadedPosts.find(p => p.id === id);
+            if(!post) return;
+            
+            document.getElementById('post-view-title').textContent = post.title || '제목 없음';
+            document.getElementById('post-view-author').textContent = post.author_nickname || '익명';
+            document.getElementById('post-view-date').textContent = post.created_at ? post.created_at.split('T')[0] : '';
+            document.getElementById('post-view-content').textContent = post.content || '내용이 없습니다.';
+            
+            // 댓글 불러오기
+            const commentContainer = document.getElementById('post-view-comments');
+            commentContainer.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:10px;">댓글을 불러오는 중...</div>';
+            
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/comments?post_id=${id}`);
+                const result = await res.json();
+                
+                if (result.status === 'success' && result.data && result.data.length > 0) {
+                    commentContainer.innerHTML = result.data.map(c => `
+                        <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 5px;">${c.writer_name || '익명'} <span style="font-size:0.75rem; color:#94a3b8; font-weight:400; margin-left:5px;">${c.created_at ? c.created_at.replace('T', ' ').substring(0, 16) : ''}</span></div>
+                                <div style="font-size: 0.95rem; line-height: 1.4; color:#334155;">${c.content}</div>
+                            </div>
+                            <button onclick="deleteComment('${c.id}', '${id}')" class="btn-sm" style="background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.2s;">삭제</button>
+                        </div>
+                    `).join('');
+                } else {
+                    commentContainer.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:10px;">등록된 댓글이 없습니다.</div>';
+                }
+            } catch (e) {
+                console.error('댓글 불러오기 오류:', e);
+                commentContainer.innerHTML = '<div style="text-align:center; color:#ef4444; padding:10px;">댓글을 불러오지 못했습니다.</div>';
+            }
+            
+            document.getElementById('post-view-modal').style.display = 'flex';
+        }
+
+        async function deleteComment(commentId, postId) {
+            if(!confirm('이 댓글을 삭제하시겠습니까?')) return;
+            
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/comments/${commentId}`, { method: 'DELETE' });
+                const data = await res.json();
+                if(data.status === 'success') {
+                    alert('댓글이 삭제되었습니다.');
+                    // 모달 창 내 댓글 리스트 리프레시
+                    viewPost(postId);
+                } else {
+                    alert('삭제 실패: ' + (data.message || data.detail || '알 수 없는 오류'));
+                }
+            } catch(e) {
+                console.error(e);
+                alert('서버와 통신 중 오류가 발생했습니다.');
+            }
+        }
+
+        let loadedNotices = [];
+        let currentEditingNoticeId = null;
+
+        async function loadNotices() {
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/notices`);
+                const result = await res.json();
+                const tbody = document.getElementById('notice-list');
+                
+                if(result.status === 'success' && result.data.length > 0) {
+                    loadedNotices = result.data;
+                    tbody.innerHTML = result.data.map((n, index) => `
+                        <tr>
+                            <td>${result.data.length - index}</td>
+                            <td style="font-weight:700;">[${n.type}] ${n.title}</td>
+                            <td>${n.created_at ? n.created_at.split('T')[0] : '방금전'}</td>
+                            <td>${n.view_count || 0}</td>
+                            <td>
+                                <button class="btn-sm btn-edit" onclick="editNotice(${n.id})">수정</button>
+                                <button class="btn-sm btn-delete" onclick="deleteNotice(${n.id})">삭제</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">등록된 공지사항이 없습니다.</td></tr>';
+                }
+            } catch(e) {
+                console.error(e);
+                document.getElementById('notice-list').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">데이터를 불러오는데 실패했습니다.</td></tr>';
+            }
+        }
+
+        function editNotice(id) {
+            const notice = loadedNotices.find(n => n.id === id);
+            if(!notice) return;
+            
+            currentEditingNoticeId = id;
+            document.getElementById('notice-type').value = notice.type;
+            document.getElementById('notice-title').value = notice.title;
+            document.getElementById('notice-content').value = notice.content;
+            
+            document.querySelector('#notice-form-container h3').innerHTML = '<i class="fa-solid fa-pen-nib"></i> 공지사항 수정';
+            document.getElementById('btn-submit-notice').textContent = '수정하기';
+            document.getElementById('notice-form-container').style.display = 'block';
+        }
+
+        async function deleteNotice(id) {
+            if(!confirm('삭제하시겠습니까?')) return;
+            
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/notices/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if(data.status === 'success') {
+                    alert('삭제되었습니다.');
+                    loadNotices();
+                } else {
+                    alert('삭제 실패: ' + (data.message || data.detail || '알 수 없는 오류'));
+                }
+            } catch(e) {
+                console.error(e);
+                alert('서버와 통신 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 새 공지 등록 UI 제어
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnShow = document.getElementById('btn-show-notice-form');
+            const btnCancel = document.getElementById('btn-cancel-notice');
+            const btnSubmit = document.getElementById('btn-submit-notice');
+            const formContainer = document.getElementById('notice-form-container');
+            
+            if(btnShow && formContainer) {
+                btnShow.addEventListener('click', () => {
+                    currentEditingNoticeId = null;
+                    document.getElementById('notice-title').value = '';
+                    document.getElementById('notice-content').value = '';
+                    document.getElementById('notice-file').value = '';
+                    document.querySelector('#notice-form-container h3').innerHTML = '<i class="fa-solid fa-pen-nib"></i> 새 공지사항 등록';
+                    document.getElementById('btn-submit-notice').textContent = '등록하기';
+                    formContainer.style.display = 'block';
+                });
+            }
+            if(btnCancel && formContainer) {
+                btnCancel.addEventListener('click', () => {
+                    formContainer.style.display = 'none';
+                    document.getElementById('notice-title').value = '';
+                    document.getElementById('notice-content').value = '';
+                    document.getElementById('notice-file').value = '';
+                });
+            }
+            if(btnSubmit) {
+                btnSubmit.addEventListener('click', async () => {
+                    const type = document.getElementById('notice-type').value;
+                    const title = document.getElementById('notice-title').value.trim();
+                    let content = document.getElementById('notice-content').value.trim();
+                    
+                    if(!title || !content) {
+                        alert('제목과 내용을 모두 입력해주세요.');
+                        return;
+                    }
+                    
+                    // 파일 업로드 처리
+                    const fileInput = document.getElementById('notice-file');
+                    if(fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        
+                        try {
+                            btnSubmit.disabled = true;
+                            btnSubmit.textContent = '업로드 중...';
+                            const uploadRes = await fetch(`${CONFIG.API_BASE_URL}/notices/upload`, {
+                                method: 'POST',
+                                body: formData
+                            });
+                            const uploadResult = await uploadRes.json();
+                            
+                            if(uploadResult.status === 'success') {
+                                const url = uploadResult.url;
+                                const ext = url.split('.').pop().toLowerCase();
+                                if(['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                                    content += `\n\n<img src="${CONFIG.API_BASE_URL.replace('/api/v1', '')}${url}" style="max-width:100%; border-radius:8px; margin-top:20px;">`;
+                                } else {
+                                    content += `\n\n<div style="margin-top:20px; padding:15px; background:#f1f5f9; border-radius:8px;"><a href="${CONFIG.API_BASE_URL.replace('/api/v1', '')}${url}" target="_blank" style="color:#3b82f6; text-decoration:none; font-weight:700;"><i class="fa-solid fa-paperclip"></i> 첨부파일: ${uploadResult.filename}</a></div>`;
+                                }
+                            } else {
+                                alert('파일 업로드 실패');
+                                btnSubmit.disabled = false;
+                                btnSubmit.textContent = currentEditingNoticeId ? '수정하기' : '등록하기';
+                                return;
+                            }
+                        } catch(e) {
+                            console.error(e);
+                            alert('파일 업로드 중 오류가 발생했습니다.');
+                            btnSubmit.disabled = false;
+                            btnSubmit.textContent = currentEditingNoticeId ? '수정하기' : '등록하기';
+                            return;
+                        }
+                    }
+                    
+                    const method = currentEditingNoticeId ? 'PUT' : 'POST';
+                    const url = currentEditingNoticeId ? `${CONFIG.API_BASE_URL}/notices/${currentEditingNoticeId}` : `${CONFIG.API_BASE_URL}/notices`;
+                    
+                    // 수정일 경우 확인창 띄우기
+                    if (currentEditingNoticeId) {
+                        if (!confirm('수정하시겠습니까?')) {
+                            btnSubmit.disabled = false;
+                            btnSubmit.textContent = '수정하기';
+                            return;
+                        }
+                    }
+                    
+                    try {
+                        const res = await fetch(url, {
+                            method: method,
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ type, title, content })
+                        });
+                        const data = await res.json();
+                        
+                        if(data.status === 'success') {
+                            alert(currentEditingNoticeId ? '수정되었습니다.' : '등록되었습니다.');
+                            formContainer.style.display = 'none';
+                            currentEditingNoticeId = null;
+                            document.getElementById('notice-title').value = '';
+                            document.getElementById('notice-content').value = '';
+                            loadNotices(); // 목록 새로고침
+                        } else {
+                            alert((currentEditingNoticeId ? '수정' : '등록') + ' 실패: ' + (data.message || data.detail || '알 수 없는 오류'));
+                        }
+                    } catch(e) {
+                        console.error('공지 등록 오류:', e);
+                        alert('서버와 통신 중 오류가 발생했습니다.');
+                    }
+                });
+            }
+        });
+
+        // 초기 로드
+        loadNotices();
+    </script>
+</body>
+</html>

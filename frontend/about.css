@@ -1,0 +1,63 @@
+/* About Page - Minimal Flat Modern (Wide - No Lines) */
+
+.about-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 120px 0;
+}
+
+.about-hero h1 {
+    font-size: 6rem;
+    font-weight: 900;
+    color: var(--text-main);
+    letter-spacing: -3px;
+    margin-bottom: 60px;
+}
+
+.about-vision {
+    background: #fff;
+    border: none; /* Light border removed */
+    box-shadow: none;
+    border-radius: 0;
+    padding: 120px 0; /* Expanded spacing instead of border */
+}
+
+.chat-bubble.user {
+    background: var(--bg-sub);
+    color: var(--text-main);
+    border: none; /* Light border removed */
+    border-radius: 0;
+    padding: 30px 40px;
+}
+
+.chat-bubble.ai {
+    background: #000;
+    color: #fff;
+    border-radius: 0;
+    padding: 30px 40px;
+}
+
+.icon-circle {
+    background: var(--bg-sub);
+    border-radius: 0;
+    color: #000;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.about-cta {
+    background: transparent;
+    border: none;
+    padding: 150px 0;
+    text-align: center;
+}
+
+.about-cta h2 {
+    font-size: 3rem;
+    margin-bottom: 50px;
+    font-weight: 800;
+}

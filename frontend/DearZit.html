@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나만의 편지 카드 | DearZit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --hp-bg: #f8fafc; --hp-text: #1e293b; --hp-accent: #7c3aed; }
+        body { background: var(--hp-bg); color: var(--hp-text); margin: 0; }
+        .dearzit-layout { display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 380px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.02); z-index: 10; }
+        .dearzit-main { flex: 1; overflow-y: auto; padding: 60px; background: #f1f5f9; }
+        .chat-area { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+        .message { padding: 15px 20px; border-radius: 20px; max-width: 85%; font-size: 0.95rem; line-height: 1.5; }
+        .message.ai { background: #f1f5f9; align-self: flex-start; border-bottom-left-radius: 5px; }
+        .message.user { background: var(--hp-accent); color: #fff; align-self: flex-end; border-bottom-right-radius: 5px; }
+        .chat-input { padding: 25px; border-top: 1px solid #e2e8f0; background: #fff; }
+        .hp-hero-block { padding: 80px 60px; border-radius: 40px; background: #fff; margin-bottom: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.05); }
+        .hp-card { background: #fff; padding: 40px; border-radius: 30px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        .btn-primary { background: var(--hp-accent); color: #fff; border: none; padding: 15px 25px; border-radius: 15px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3); }
+
+        /* AI Builder Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(10px); }
+        .modal-content { background: #fff; margin: 2% auto; width: 95%; height: 92%; border-radius: 30px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .builder-header { padding: 20px 40px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #fff; }
+        .builder-body { flex: 1; display: flex; overflow: hidden; }
+        .builder-sidebar { width: 350px; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; background: #f8fafc; }
+        .builder-preview { flex: 1; display: flex; flex-direction: column; background: #e2e8f0; padding: 20px; }
+        .preview-container { flex: 1; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; }
+        #builder-iframe { width: 100%; height: 100%; border: none; }
+        .preview-header { padding: 10px 20px; background: #fff; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        .close-btn { font-size: 2rem; cursor: pointer; border: none; background: none; color: #64748b; }
+        .close-btn:hover { color: #000; }
+        
+        .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--hp-accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="dearzit-layout">
+        <main class="dearzit-main">
+            <div id="homepage-content">
+                <div class="hp-hero-block">
+                    <div style="display: inline-block; padding: 6px 15px; background: var(--hp-accent); color: #fff; border-radius: 50px; font-size: 0.75rem; font-weight: 800; margin-bottom: 20px; letter-spacing: 1px;">PREVIEW MODE</div>
+                    <h1 id="hp-main-title" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 20px;">편지 카드를 제작하는 중...</h1>
+                    <p id="hp-subtitle" style="font-size: 1.2rem; color: #64748b;">AI가 당신의 요청을 분석하여 최적의 편지/엽서 디자인을 생성합니다.</p>
+                </div>
+                <div id="ai-description" class="hp-card" style="color: #64748b; line-height: 1.8; margin-bottom: 30px;">
+                    왼쪽 채팅창을 통해 원하는 편지지의 스타일이나 내용을 입력해 보세요.
+                </div>
+                <div class="hp-card" style="text-align: center; padding: 40px; border: 2px dashed #e2e8f0; background: #f8fafc;">
+                    <p style="margin-bottom: 20px; color: #64748b; font-weight: 600;">이미 설문을 완료하셨나요? AI가 당신의 데이터를 바탕으로 편지 카드를 구성할 수 있습니다.</p>
+                    <button id="rebuild-btn-main" class="btn-primary" style="background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 18px 40px; font-size: 1.1rem; border-radius: 20px; border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI 편지 카드 지금 제작하기
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Builder Modal (SCR-003) -->
+    <div id="ai-builder-modal" class="modal">
+        <div class="modal-content">
+            <div class="builder-header">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 40px; height: 40px; background: #000; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <h2 style="font-weight: 800; font-size: 1.5rem;">Premium AI Letter Card Builder</h2>
+                </div>
+                <button id="close-builder-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="builder-body">
+                <aside class="builder-sidebar">
+                    <div id="builder-chat-messages" class="chat-area">
+                        <div class="message ai">안녕하세요! <b>Premium AI 빌더</b>에 오신 것을 환영합니다. <br><br>원하는 편지 디자인이나 스타일을 말씀해 주시면 제가 내용을 직접 작성해 드릴게요. (예: "친구 생일 축하용 귀여운 엽서 만들어줘")</div>
+                    </div>
+                    <div class="chat-input">
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="builder-user-input" placeholder="요구사항을 입력하세요..." style="flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; outline: none;">
+                            <button id="builder-send-btn" class="btn-primary" style="border-radius: 12px;"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </aside>
+                <main class="builder-preview">
+                    <div class="preview-header" style="border-radius: 20px 20px 0 0;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span style="font-weight: 800; color: #64748b;"><i class="fa-solid fa-desktop"></i> REAL-TIME PREVIEW</span>
+                        </div>
+                        <button id="apply-homepage-btn" class="btn-primary" style="background: #22c55e; border-radius: 10px; padding: 10px 20px;">
+                            <i class="fa-solid fa-check"></i> 이 디자인 적용하기
+                        </button>
+                    </div>
+                    <div class="preview-container" style="border-radius: 0 0 20px 20px;">
+                        <div id="builder-loading" class="loading-overlay">
+                            <div class="spinner"></div>
+                            <p style="margin-top: 20px; font-weight: 800; color: var(--hp-accent);">AI가 코드를 작성하고 있습니다...</p>
+                        </div>
+                        <iframe id="builder-iframe" srcdoc="<div style='display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;color:#94a3b8;flex-direction:column;gap:20px;'><i class='fa-solid fa-wand-magic-sparkles' style='font-size:3rem;'></i><p>요청을 입력하면 여기에 실시간 미리보기가 나타납니다.</p></div>"></iframe>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="common.js"></script>
+    <script src="app.js?v=5"></script>
+</body>
+</html>

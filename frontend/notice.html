@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공지사항 | DearZit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="landing.css">
+    
+</head>
+<body>
+    
+    <header class="main-header" style="border-bottom: 2px solid #000;">
+        <div class="wide-container" style="display: flex; align-items: center; justify-content: space-between; width: 100%; height: 100%;">
+            <a href="/index.html" class="logo" style="text-decoration: none;">
+                <i class="fa-solid fa-cube"></i>
+                <span>DearZit</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/notice.html" class="active">공지사항</a></li>
+                    <li><a href="/about.html">디어지트란?</a></li>
+                    <li><a href="/agit.html">홈피들</a></li>
+                    <li><a href="/community.html">소통게시판</a></li>
+                    <li><a href="/support.html">고객지원</a></li>
+                    <li class="nav-admin">
+                        <a href="/admin.html" target="_blank" id="admin-link" style="text-decoration: none; color: #fff; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 800; transition: 0.3s; background: #ff0000; display: inline-block;">관리자</a>
+                    </li>
+                </ul>
+            </nav>
+            <div id="auth-nav" class="auth-nav"></div>
+        </div>
+    </header>
+
+    <div id="landing-wrapper"><main>
+    <div class="community-container" style="max-width: 1200px; margin: 0 auto; padding: 80px 40px;">
+        <div class="notice-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 50px;">
+            <div>
+                <h2 style="font-size: 3rem; font-weight: 900; letter-spacing: -2px;">공지사항</h2>
+                <p style="color: #64748b; margin-top: 10px; font-size: 1.1rem;">DearZit의 새로운 소식과 업데이트 안내입니다.</p>
+            </div>
+            <div class="notice-search" style="position: relative;">
+                <input type="text" placeholder="검색어를 입력하세요" style="padding: 15px 20px 15px 50px; border-radius: 15px; border: 2px solid #000; outline: none; width: 350px; font-weight: 600;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 20px; top: 18px; color: #000;"></i>
+            </div>
+        </div>
+        <div id="notice-list-container" class="board-table-wrapper">
+            <table class="board-table" style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="border-bottom: 3px solid #000;">
+                        <th style="padding:20px 10px; text-align:center; width:80px;">번호</th>
+                        <th style="padding:20px 10px; text-align:center; width:160px;">구분</th>
+                        <th style="padding:20px 10px; text-align:left;">제목</th>
+                        <th style="padding:20px 10px; text-align:center; width:160px;">날짜</th>
+                    </tr>
+                </thead>
+                <tbody id="notice-list-body">
+                    <tr><td colspan="4" style="text-align:center; padding:40px;">데이터를 불러오는 중...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 상세 보기 화면 (초기 숨김) -->
+        <div id="notice-read-container" style="display:none; background:#fff; border-top:2px solid #000; padding-top:40px;">
+            <div style="margin-bottom:30px;">
+                <div id="notice-read-type" style="margin-bottom:15px;"></div>
+                <h3 id="notice-read-title" style="font-size:2.5rem; font-weight:900; margin:0; word-break:keep-all; line-height:1.4;">제목</h3>
+                <div style="margin-top:20px; padding-bottom:20px; border-bottom:1px solid #e2e8f0; font-size:1rem; color:#64748b; display:flex; justify-content:space-between;">
+                    <span>DearZit 관리자</span>
+                    <span>등록일: <span id="notice-read-date"></span> &nbsp;|&nbsp; 조회수: <span id="notice-read-count"></span></span>
+                </div>
+            </div>
+            
+            <div id="notice-read-content" style="min-height:300px; padding:20px 0 60px 0; line-height:2; white-space:pre-wrap; font-size:1.15rem; color:#1e293b; border-bottom:1px solid #e2e8f0;">
+                본문 내용
+            </div>
+            
+            <div style="margin-top:40px; text-align:center;">
+                <button onclick="showNoticeList()" style="background:#000; color:#fff; padding:15px 50px; border:none; border-radius:10px; font-weight:800; font-size:1.1rem; cursor:pointer; transition:0.2s;">목록으로</button>
+            </div>
+        </div>
+    </div>
+</main></div>
+    <script src="config.js"></script>
+    <script src="common.js"></script>
+    <script>
+        let loadedNotices = [];
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tbody = document.getElementById('notice-list-body');
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/notices`);
+                const result = await res.json();
+                
+                if(result.status === 'success' && result.data.length > 0) {
+                    loadedNotices = result.data;
+                    tbody.innerHTML = result.data.map((n, index) => {
+                        let typeBadge = '';
+                        if(n.type === '공지') {
+                            typeBadge = `<span style="background:#000; color:#fff; padding:5px 12px; border-radius:4px; font-weight:900; font-size:0.75rem;">공지</span>`;
+                        } else if(n.type === '업데이트') {
+                            typeBadge = `<span style="border:1px solid #000; padding:5px 12px; border-radius:4px; font-weight:900; font-size:0.75rem;">업데이트</span>`;
+                        } else {
+                            typeBadge = `<span style="background:#f1f5f9; color:#475569; padding:5px 12px; border-radius:4px; font-weight:900; font-size:0.75rem;">${n.type}</span>`;
+                        }
+                        
+                        return `
+                        <tr style="border-bottom: 1px solid #eee; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'" onclick="showNoticeRead('${n.id}')">
+                            <td style="padding:25px 10px; text-align:center; color:#999;">${result.data.length - index}</td>
+                            <td style="padding:25px 10px; text-align:center;">${typeBadge}</td>
+                            <td style="padding:25px 10px; font-weight:700;">
+                                <a href="#${n.id}" style="text-decoration:none; color:#000;" onclick="event.preventDefault(); event.stopPropagation(); showNoticeRead('${n.id}')">${n.title}</a>
+                            </td>
+                            <td style="padding:25px 10px; text-align:center; color:#999; white-space:nowrap;">${n.created_at ? n.created_at.split('T')[0] : '방금전'}</td>
+                        </tr>
+                        `;
+                    }).join('');
+                    
+                    // URL 해시가 있으면 해당 공지 상세보기
+                    if(window.location.hash) {
+                        const hashId = window.location.hash.substring(1);
+                        if(hashId) {
+                            showNoticeRead(hashId);
+                        }
+                    }
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">등록된 공지사항이 없습니다.</td></tr>';
+                }
+            } catch(e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">데이터를 불러오는데 실패했습니다.</td></tr>';
+            }
+        });
+
+        // 상세 페이지 열기
+        function showNoticeRead(id) {
+            const notice = loadedNotices.find(n => n.id.toString() === id.toString());
+            if(!notice) return;
+            
+            let typeBadge = '';
+            if(notice.type === '공지') {
+                typeBadge = `<span style="background:#000; color:#fff; padding:5px 12px; border-radius:4px; font-weight:900; font-size:0.85rem;">공지</span>`;
+            } else if(notice.type === '업데이트') {
+                typeBadge = `<span style="border:2px solid #000; padding:3px 12px; border-radius:4px; font-weight:900; font-size:0.85rem;">업데이트</span>`;
+            } else {
+                typeBadge = `<span style="background:#f1f5f9; color:#475569; padding:5px 12px; border-radius:4px; font-weight:900; font-size:0.85rem;">${notice.type}</span>`;
+            }
+            
+            document.getElementById('notice-read-type').innerHTML = typeBadge;
+            document.getElementById('notice-read-title').textContent = notice.title;
+            document.getElementById('notice-read-date').textContent = notice.created_at ? notice.created_at.split('T')[0] : '방금전';
+            document.getElementById('notice-read-count').textContent = notice.view_count || 0;
+            document.getElementById('notice-read-content').innerHTML = notice.content || '내용이 없습니다.';
+            
+            // 화면 전환
+            document.getElementById('notice-list-container').style.display = 'none';
+            document.getElementById('notice-read-container').style.display = 'block';
+            document.querySelector('.notice-search').style.display = 'none'; // 검색창 숨김
+            
+            // 주소 변경 및 스크롤 최상단
+            window.history.replaceState(null, null, `#${id}`);
+            window.scrollTo(0, 0);
+        }
+        
+        // 목록으로 돌아가기
+        function showNoticeList() {
+            document.getElementById('notice-list-container').style.display = 'block';
+            document.getElementById('notice-read-container').style.display = 'none';
+            document.querySelector('.notice-search').style.display = 'block'; // 검색창 다시 표시
+            
+            // 해시 제거
+            window.history.replaceState(null, null, window.location.pathname);
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>

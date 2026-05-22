@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 미니미 스타일 컨셉 입력창</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --accent-primary: #7c3aed;
+            --bg-sub: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f1f5f9;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .popup-card {
+            background: #ffffff;
+            border: 2px solid #000000;
+            width: 100%;
+            max-width: 520px;
+            padding: 30px;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .popup-header i {
+            font-size: 1.5rem;
+            color: var(--accent-primary);
+        }
+
+        .popup-header h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .info-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 800;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            height: 120px;
+            border: 2px solid #000;
+            padding: 12px;
+            font-size: 0.9rem;
+            outline: none;
+            resize: none;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .input-group textarea:focus {
+            border-color: var(--accent-primary);
+            background: var(--bg-sub);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-primary), #6d28d9);
+            color: #fff;
+            border: 2px solid #000;
+            padding: 15px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
+            transition: 0.1s;
+        }
+
+        .btn-submit:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="popup-card">
+        <div class="popup-header">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <h3>AI 미니미 스타일 컨셉 설정</h3>
+        </div>
+
+        <p class="info-desc">
+            내가 상상하는 나만의 미니미 모습을 자유롭게 설명해 주세요. 캐릭터의 헤어스타일, 모자, 옷 색상, 또는 원하는 감정이나 성격을 상세히 작성할수록 싱크로율 높은 아바타가 생성됩니다!
+        </p>
+
+        <div class="input-group">
+            <label for="popup-prompt">아바타 스타일 컨셉 키워드</label>
+            <textarea id="popup-prompt" placeholder="예: 귀여운 토끼 귀 모자를 쓴 파란색 멜빵바지 도트 캐릭터, 밝게 미소 짓는 얼굴"></textarea>
+        </div>
+
+        <button onclick="submitPrompt()" class="btn-submit">
+            <i class="fa-solid fa-wand-magic"></i> 나만의 AI 캐릭터 만들기
+        </button>
+    </div>
+
+    <script>
+        function submitPrompt() {
+            const promptText = document.getElementById('popup-prompt').value.trim();
+            if (!promptText) {
+                alert('원하시는 캐릭터 스타일이나 성격 컨셉을 꼭 입력해 주세요!');
+                return;
+            }
+
+            // 부모 창(window.opener)으로 데이터 전송 및 함수 실행
+            if (window.opener && !window.opener.closed) {
+                window.opener.generateCharacterFromPrompt(promptText);
+            } else {
+                alert('부모 마이페이지 창이 닫혀 있어서 연동이 실패했습니다.');
+            }
+            window.close(); // 팝업 닫기
+        }
+    </script>
+</body>
+</html>

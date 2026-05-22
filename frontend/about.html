@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>디어지트란? | DearZit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+    <header class="main-header" style="border-bottom: 2px solid #000;">
+        <div class="wide-container" style="display: flex; align-items: center; justify-content: space-between; width: 100%; height: 100%;">
+            <a href="/index.html" class="logo" style="text-decoration: none;">
+                <i class="fa-solid fa-cube"></i>
+                <span>DearZit</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/notice.html">공지사항</a></li>
+                    <li><a href="/about.html" class="active">디어지트란?</a></li>
+                    <li><a href="/agit.html">홈피들</a></li>
+                    <li><a href="/community.html">소통게시판</a></li>
+                    <li><a href="/support.html">고객지원</a></li>
+                    <li class="nav-admin">
+                        <a href="/admin.html" target="_blank" id="admin-link" style="text-decoration: none; color: #fff; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 800; transition: 0.3s; background: #ff0000; display: inline-block;">관리자</a>
+                    </li>
+                </ul>
+            </nav>
+            <div id="auth-nav" class="auth-nav"></div>
+        </div>
+    </header>
+
+    <div id="landing-wrapper"><main>
+    <div class="community-container" style="padding: 100px 40px; max-width: 1000px;">
+        <div style="text-align: center; margin-bottom: 80px;">
+            <h1 style="font-size: 5rem; font-weight: 900; letter-spacing: -4px; line-height: 1.1; margin-bottom: 30px;">당신의 개성을<br><span style="color: var(--accent-primary);">홈피</span>에 담습니다.</h1>
+            <p style="font-size: 1.5rem; color: #64748b; font-weight: 500;">DearZit은 나만의 공간을 꾸미고, AI 기술을 통해 세상에 단 하나뿐인<br>나만의 3D 캐릭터를 만들어 소통할 수 있는 미니홈피 서비스입니다.</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 100px;">
+            <div style="background: #fff; padding: 50px; border: 2px solid #000; border-radius: 25px; box-shadow: 8px 8px 0 #000;">
+                <div style="font-size: 2.5rem; margin-bottom: 20px;"><i class="fa-solid fa-house-user"></i></div>
+                <h3 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 15px;">나만의 홈피 꾸미기</h3>
+                <p style="color: #475569; font-size: 1.1rem; line-height: 1.6;">원하는 메뉴를 만들고, 사진을 올리고, 방명록을 관리하며 나만의 공간을 자유롭게 꾸며보세요. 소중한 사람들과 따뜻한 소통을 이어갈 수 있습니다.</p>
+            </div>
+            <div style="background: #fff; padding: 50px; border: 2px solid #000; border-radius: 25px; box-shadow: 8px 8px 0 #000;">
+                <div style="font-size: 2.5rem; margin-bottom: 20px;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <h3 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 15px;">AI 3D 캐릭터 생성기</h3>
+                <p style="color: #475569; font-size: 1.1rem; line-height: 1.6;">내 얼굴 사진 한 장으로 나를 꼭 닮은 3D 아바타를 만들어보세요. 최신 AI 기술이 사진을 분석하여 생동감 넘치는 나만의 미니미를 제작해 줍니다.</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 120px; text-align: center; padding: 80px; background: #fafafa; border-radius: 30px;">
+            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 30px;">지금 바로 시작해 보세요.</h2>
+            <a href="/mypage.html" class="btn-purple-hp" style="padding: 20px 60px; font-size: 1.3rem; border-radius: 15px; display: inline-block;">AI 3D 캐릭터 만들기</a>
+        </div>
+    </div>
+</main></div>
+    <script src="config.js"></script>
+    <script src="common.js"></script>
+</body>
+</html>

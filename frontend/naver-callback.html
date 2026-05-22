@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>네이버 로그인 처리 중...</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; }
+        .box { text-align: center; }
+        .spinner { width: 48px; height: 48px; border: 4px solid #e2e8f0; border-top: 4px solid #03C75A; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        p { color: #64748b; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="spinner"></div>
+        <p>네이버 로그인 처리 중...</p>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        (async function() {
+            // URL 해시에서 파라미터 추출
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const accessToken = params.get('access_token');
+            const state = params.get('state');
+            const savedState = sessionStorage.getItem('naver_state');
+
+            if (!accessToken) {
+                alert('네이버 로그인에 실패했습니다.');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // state 검증 (CSRF 방지)
+            if (state !== savedState) {
+                alert('보안 오류가 발생했습니다. 다시 시도해주세요.');
+                window.location.href = '/login.html';
+                return;
+            }
+            sessionStorage.removeItem('naver_state');
+
+            // 네이버 사용자 정보 조회 (백엔드 프록시 경유)
+            try {
+                const res = await fetch(CONFIG.API_BASE_URL + '/auth/naver/userinfo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ access_token: accessToken })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const naverUser = {
+                        id: 'naver_' + data.id,
+                        email: data.email || '',
+                        name: data.name || '네이버 사용자',
+                        provider: 'naver',
+                        avatar: data.profile_image || ''
+                    };
+                    localStorage.setItem(CONFIG.USER_INFO_KEY, JSON.stringify(naverUser));
+                    localStorage.setItem(CONFIG.AUTH_TOKEN_KEY, accessToken);
+                    window.location.href = '/index.html';
+                } else {
+                    throw new Error('사용자 정보 조회 실패');
+                }
+            } catch (err) {
+                // 백엔드 없을 시 토큰만 저장 후 이동
+                console.warn('백엔드 연동 없이 토큰 저장:', err);
+                const naverUser = {
+                    id: 'naver_user',
+                    email: '',
+                    name: '네이버 사용자',
+                    provider: 'naver',
+                    avatar: ''
+                };
+                localStorage.setItem(CONFIG.USER_INFO_KEY, JSON.stringify(naverUser));
+                localStorage.setItem(CONFIG.AUTH_TOKEN_KEY, accessToken);
+                window.location.href = '/index.html';
+            }
+        })();
+    </script>
+</body>
+</html>

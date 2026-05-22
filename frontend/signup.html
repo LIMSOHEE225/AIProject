@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 | DearZit</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="landing.css">
+    
+    <link rel="icon" href="favicon.ico">
+</head>
+<body>
+    
+    <header class="main-header">
+        <div class="wide-container" style="display: flex; align-items: center; justify-content: space-between; width: 100%; height: 100%;">
+            <a href="/index.html" class="logo" style="text-decoration: none;">
+                <i class="fa-solid fa-cube"></i>
+                <span>DearZit</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/notice.html">공지사항</a></li>
+                    <li><a href="/about.html">디어지트란?</a></li>
+                    <li><a href="/agit.html">홈피들</a></li>
+                    <li><a href="/community.html">소통게시판</a></li>
+                    <li><a href="/support.html">고객지원</a></li>
+                    <li class="nav-admin">
+                        <a href="/admin.html" target="_blank" id="admin-link" style="text-decoration: none; color: #fff; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 800; transition: 0.3s; background: #ff0000; display: inline-block;">관리자</a>
+                    </li>
+                </ul>
+            </nav>
+            <div id="auth-nav" class="auth-nav"></div>
+        </div>
+    </header>
+
+
+    <div id="landing-wrapper">
+        <main>
+            
+            <div style="max-width: 600px; margin: 40px auto; padding: 50px; background: #fff; border-radius: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; font-size: 1rem;">
+                <h2 style="font-size: 2.2rem; font-weight: 800; text-align: center; margin-bottom: 40px;">회원가입</h2>
+                <form id="signup-form" class="auth-form">
+
+                    <!-- 닉네임 -->
+                    <div id="nickname-group-container" style="margin-bottom: 8px; display: flex; gap: 8px;">
+                        <input type="text" id="nickname-input" placeholder="닉네임" required style="flex:1; padding: 16px 18px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box;">
+                        <button type="button" id="btn-check-nickname" style="padding: 0 16px; border-radius: 15px; border: 1px solid #7c3aed; background: #fff; color: #7c3aed; font-weight: 700; cursor: pointer; white-space: nowrap;">중복확인</button>
+                    </div>
+                    <div id="nickname-msg" class="status-msg" style="display:none; font-size:0.82rem; margin-bottom:16px; padding-left:4px;"></div>
+
+                    <!-- 실명 -->
+                    <div style="margin-bottom: 8px;">
+                        <input type="text" id="realname-input" placeholder="실명" required style="width: 100%; padding: 16px 18px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 16px;"></div>
+
+                    <!-- 이메일 -->
+                    <div id="email-group-container" style="margin-bottom: 8px; display: flex; gap: 8px;">
+                        <input type="email" id="email-input" placeholder="이메일 주소" required style="flex:1; padding: 16px 18px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box;">
+                        <button type="button" id="btn-check-email" style="padding: 0 16px; border-radius: 15px; border: 1px solid #7c3aed; background: #fff; color: #7c3aed; font-weight: 700; cursor: pointer; white-space: nowrap;">중복확인</button>
+                    </div>
+                    <div id="email-msg" class="status-msg" style="display:none; font-size:0.82rem; margin-bottom:16px; padding-left:4px;"></div>
+
+                    <!-- 비밀번호 -->
+                    <div style="margin-bottom: 8px; position: relative;">
+                        <input type="password" id="password-input" placeholder="비밀번호 (영문+숫자+특수문자 8자 이상)" required style="width: 100%; padding: 16px 50px 16px 18px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box;">
+                        <button type="button" id="toggle-pw"
+                            onclick="togglePassword('password-input','toggle-pw')"
+                            style="position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#94a3b8; font-size:1rem; padding:4px;">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="password-msg" class="status-msg" style="display:none; font-size:0.82rem; margin-bottom:8px; padding-left:4px;"></div>
+                    <div style="margin-bottom: 8px; position: relative;">
+                        <input type="password" id="password-confirm-input" placeholder="비밀번호 확인" required style="width: 100%; padding: 16px 50px 16px 18px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box;">
+                        <button type="button" id="toggle-pw-confirm"
+                            onclick="togglePassword('password-confirm-input','toggle-pw-confirm')"
+                            style="position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#94a3b8; font-size:1rem; padding:4px;">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="password-confirm-msg" class="status-msg" style="display:none; font-size:0.82rem; margin-bottom:16px; padding-left:4px;"></div>
+
+                    <!-- 생년월일 -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display:block; font-size:0.82rem; color:#64748b; font-weight:600; margin-bottom:6px; padding-left:4px;">생년월일</label>
+                        <input type="date" id="birthdate-input" style="width: 100%; padding: 16px 18px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box; color: #1e293b;">
+                    </div>
+
+                    <!-- 성별 -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display:block; font-size:0.82rem; color:#64748b; font-weight:600; margin-bottom:6px; padding-left:4px;">성별</label>
+                        <select id="gender-select" style="width: 100%; padding: 16px 18px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box; color: #1e293b;">
+                            <option value="">선택 안 함</option>
+                            <option value="male">남성</option>
+                            <option value="female">여성</option>
+                        </select>
+                    </div>
+
+                    <!-- 휴대폰 인증 -->
+                    <div id="phone-verification-group" style="margin-bottom: 16px;">
+                        <label style="display:block; font-size:0.82rem; color:#64748b; font-weight:600; margin-bottom:6px; padding-left:4px;">휴대폰 본인인증</label>
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <select id="telecom-select" style="flex:0 0 120px; padding: 16px 12px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box; color: #1e293b;">
+                                <option value="">통신사</option>
+                                <option value="SKT">SKT</option>
+                                <option value="KT">KT</option>
+                                <option value="LGU+">LGU+</option>
+                                <option value="SKT알뜰폰">SKT 알뜰폰</option>
+                                <option value="KT알뜰폰">KT 알뜰폰</option>
+                                <option value="LGU+알뜰폰">LGU+ 알뜰폰</option>
+                            </select>
+                            <input type="tel" id="phone-input" placeholder="휴대폰 번호 (숫자만)" style="flex:1; padding: 16px 18px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box;">
+                            <button type="button" id="btn-phone-verify" style="padding: 0 14px; border-radius: 15px; border: 1px solid #7c3aed; background: #fff; color: #7c3aed; font-weight: 700; cursor: pointer; white-space: nowrap;">인증요청</button>
+                        </div>
+                        <!-- SMS 인증번호 입력 (인증 요청 후 표시) -->
+                        <div id="sms-code-group" style="display:none; display: flex; gap: 8px; margin-bottom: 8px;">
+                            <input type="text" id="sms-code-input" placeholder="인증번호 6자리" maxlength="6" style="flex:1; padding: 16px 18px; border-radius: 15px; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; box-sizing: border-box;">
+                            <button type="button" id="btn-sms-confirm" style="padding: 0 14px; border-radius: 15px; border: none; background: #7c3aed; color: #fff; font-weight: 700; cursor: pointer; white-space: nowrap;">확인</button>
+                        </div>
+                        <div id="sms-timer" style="font-size:0.8rem; color:#64748b; padding-left:4px; min-height:1.2em;"></div>
+                        <div id="phone-msg" class="status-msg" style="display:none; font-size:0.82rem; padding-left:4px;"></div>
+                    </div>
+
+                    <!-- 제출 버튼 -->
+                    <button type="submit" id="btn-signup-submit" class="btn-cta" style="width: 100%; border: none; cursor: pointer; padding: 20px; margin-top: 8px;">가입하기</button>
+                </form>
+            </div>
+        
+        </main>
+
+        <footer class="landing-footer">
+            <p>&copy; 2026 DearZit Project. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="common.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        function togglePassword(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            const icon = document.querySelector('#' + btnId + ' i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-regular fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-regular fa-eye';
+            }
+        }
+    </script>
+</body>
+</html>
