@@ -52,6 +52,7 @@
     letter-spacing: 1px;
     color: #000;
     text-align: center;
+    white-space: nowrap; /* 글씨가 줄바꿈되지 않게 방지 */
 }
 
 .board-table td {
@@ -61,6 +62,7 @@
     font-weight: 500;
     font-size: 1rem;
     transition: all 0.2s ease;
+    white-space: nowrap; /* 글씨가 줄바꿈되지 않게 방지 */
 }
 
 .board-table tr:hover td {

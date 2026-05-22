@@ -32,6 +32,7 @@ body {
     min-height: 100vh;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    min-width: 1200px; /* 창을 줄여도 레이아웃이 깨지지 않도록 최소 너비 고정 */
 }
 
 .wide-container {
@@ -77,6 +78,7 @@ body {
     font-weight: 600;
     font-size: 0.95rem;
     transition: 0.3s;
+    white-space: nowrap; /* 글씨가 줄바꿈되지 않게 방지 */
 }
 
 .main-nav a:hover, .main-nav a.active {
