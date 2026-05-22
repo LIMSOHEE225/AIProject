@@ -3,7 +3,7 @@ const isLocal = window.location.hostname === '127.0.0.1' || window.location.host
 const CONFIG = {
     API_BASE_URL: isLocal 
         ? "http://127.0.0.1:8000/api/v1" 
-        : "https://your-backend-url.onrender.com/api/v1", // 배포 후 Render 백엔드 주소로 변경
+        : "https://aiproject-3dtf.onrender.com/api/v1", // 배포 후 Render 백엔드 주소로 변경
     AUTH_TOKEN_KEY: "dearzit_access_token",
     USER_INFO_KEY: "dearzit_user_info",
     SUPABASE_URL: "https://nbexahyuihdhhdkvdnti.supabase.co",
